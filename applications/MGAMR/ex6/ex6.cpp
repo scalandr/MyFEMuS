@@ -86,12 +86,12 @@ bool SetRefinementFlag(const std::vector < double >& x, const int& elemgroupnumb
   else if(elemgroupnumber == 9 && level < numberOfUniformLevels + 2){
     refine = true;
   }
-  else if(elemgroupnumber == 10 && level < numberOfUniformLevels + 3){
-    refine = true;
-  }
-  else if(elemgroupnumber == 11 && level < numberOfUniformLevels + 4){
-    refine = true;
-  }
+//   else if(elemgroupnumber == 10 && level < numberOfUniformLevels + 3){
+//     refine = true;
+//   }
+//   else if(elemgroupnumber == 11 && level < numberOfUniformLevels + 4){
+//     refine = true;
+//   }
 //   else if(elemgroupnumber == 12 && level < numberOfUniformLevels + 5){
 //     refine = true;
 //   }
@@ -130,7 +130,7 @@ int main(int argc, char** args) {
   // read coarse level mesh and generate finers level meshes
   double scalingFactor = 1.;
   //mlMsh.ReadCoarseMesh("./input/adaptiveRef6Tri.neu", "seventh", scalingFactor);
-  mlMsh.ReadCoarseMesh("./input/Lshape3DMixed.neu", "seventh", scalingFactor);
+  mlMsh.ReadCoarseMesh("./input/Lshape3DMixed_mini.neu", "seventh", scalingFactor);
   //mlMsh.ReadCoarseMesh("./input/adaptiveCube8.neu", "seventh", scalingFactor);
   //mlMsh.ReadCoarseMesh("./input/Lshape3DMixed_mini.neu", "seventh", scalingFactor);
   /* "seventh" is the order of accuracy that is used in the gauss integration scheme
@@ -138,9 +138,9 @@ int main(int argc, char** args) {
   unsigned dim = mlMsh.GetDimension();
 
   numberOfUniformLevels = 1;
-  unsigned numberOfSelectiveLevels = 2;
+  unsigned numberOfSelectiveLevels = 1;
   
-  mlMsh.RefineMesh(numberOfUniformLevels + numberOfSelectiveLevels, numberOfUniformLevels , SetRefinementFlag);
+  mlMsh.RefineMesh(numberOfUniformLevels + numberOfSelectiveLevels, numberOfUniformLevels , SetRefinementFlag2);
  
   
   mlMsh.PrintInfo();
@@ -149,7 +149,7 @@ int main(int argc, char** args) {
   mlSol.Initialize("All");
 
   // attach the boundary condition function and generate boundary data
-  mlSol.AttachSetBoundaryConditionFunction(SetBoundaryCondition);
+  mlSol.AttachSetBoundaryConditionFunction(SetBoundaryCondition2);
   mlSol.GenerateBdc("All");
 
   // define the multilevel problem attach the mlSol object to it
@@ -182,8 +182,8 @@ int main(int argc, char** args) {
 
   system.SetSolverFineGrids(RICHARDSON);
   //system.SetSolverFineGrids(CG);
-  //system.SetPreconditionerFineGrids(IDENTITY_PRECOND);
-  system.SetPreconditionerFineGrids(ILU_PRECOND);
+  system.SetPreconditionerFineGrids(IDENTITY_PRECOND);
+  //system.SetPreconditionerFineGrids(ILU_PRECOND);
   //system.SetPreconditionerFineGrids(JACOBI_PRECOND);
   //system.SetPreconditionerFineGrids(SOR_PRECOND);
   

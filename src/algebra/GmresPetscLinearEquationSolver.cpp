@@ -511,7 +511,7 @@ namespace femus {
 	
  	
 	
-	scale = 1.;
+	//scale = 1.2;
 	
 	//BEGIN da commentare
 // 	level = _msh->GetLevel();
@@ -531,8 +531,8 @@ namespace femus {
 	
 	//std::cout << "level = " << level << "scale = "<< scale << std::endl;
 	
-	KSPRichardsonSetScale(ksp, scale);
-        //KSPRichardsonSetSelfScale(ksp, PETSC_TRUE);
+	//KSPRichardsonSetScale(ksp, scale);
+        KSPRichardsonSetSelfScale(ksp, PETSC_TRUE);
         return;
 
       case CHEBYSHEV:
