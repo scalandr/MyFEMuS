@@ -509,14 +509,14 @@ namespace femus {
       case RICHARDSON:
         KSPSetType(ksp, (char*) KSPRICHARDSON);
 	
- 	
-
+	
+        level = _msh->GetLevel(); 	
 	
 	//BEGIN da commentare
 // 	scale = 0.2;
 // 	
 // 	//BEGIN da commentare
-// 	level = _msh->GetLevel();
+
 // 	numberOfUniformLevels = 1; // deve corrispondere a numberOfUniformLevels nel main
 // 	
 // 	if(numberOfUniformLevels == 1){
@@ -531,10 +531,11 @@ namespace femus {
 // 	}
  	//END da commentare
 	
-	std::cout << "richardson level = " << level << "delta/MGlevel = "<< _scale << std::endl;
+	std::cout << "2 richardson level = " << level << " delta/MGlevel = "<< _scale << std::endl;
 	
 	KSPRichardsonSetScale(ksp, _scale);
         //KSPRichardsonSetSelfScale(ksp, PETSC_TRUE);
+	_kspRichardsonIsInitialized = true;
         return;
 
       case CHEBYSHEV:
