@@ -86,15 +86,15 @@ bool SetRefinementFlag(const std::vector < double >& x, const int& elemgroupnumb
   else if(elemgroupnumber == 9 && level < numberOfUniformLevels + 2){
     refine = true;
   }
-//   else if(elemgroupnumber == 10 && level < numberOfUniformLevels + 3){
-//     refine = true;
-//   }
-//   else if(elemgroupnumber == 11 && level < numberOfUniformLevels + 4){
-//     refine = true;
-//   }
-//   else if(elemgroupnumber == 12 && level < numberOfUniformLevels + 5){
-//     refine = true;
-//   }
+  else if(elemgroupnumber == 10 && level < numberOfUniformLevels + 3){
+    refine = true;
+  }
+  else if(elemgroupnumber == 11 && level < numberOfUniformLevels + 4){
+    refine = true;
+  }
+  else if(elemgroupnumber == 12 && level < numberOfUniformLevels + 5){
+    refine = true;
+  }
 //   else if(elemgroupnumber == 13 && level < numberOfUniformLevels + 6){
 //     refine = true;
 //   }
@@ -130,16 +130,16 @@ int main(int argc, char** args) {
   MultiLevelMesh mlMsh;
   // read coarse level mesh and generate finers level meshes
   double scalingFactor = 1.;
-  //mlMsh.ReadCoarseMesh("./input/adaptiveRef6Tri.neu", "seventh", scalingFactor);
-  //mlMsh.ReadCoarseMesh("./input/Lshape3DMixed_mini.neu", "seventh", scalingFactor);
+  //mlMsh.ReadCoarseMesh("./input/adaptiveRef6.neu", "seventh", scalingFactor);
+  //mlMsh.ReadCoarseMesh("./input/Lshape.neu", "seventh", scalingFactor);
   //mlMsh.ReadCoarseMesh("./input/adaptiveCube8.neu", "seventh", scalingFactor);
-  mlMsh.ReadCoarseMesh("./input/Lshape3DTeT_mini.neu", "seventh", scalingFactor);
+  mlMsh.ReadCoarseMesh("./input/Lshape3DMixed_mini.neu", "seventh", scalingFactor);
   /* "seventh" is the order of accuracy that is used in the gauss integration scheme
      probably in the furure it is not going to be an argument of this function   */
   unsigned dim = mlMsh.GetDimension();
 
   numberOfUniformLevels = 1;
-  unsigned numberOfSelectiveLevels = 4;
+  unsigned numberOfSelectiveLevels = 1;
   
   mlMsh.RefineMesh(numberOfUniformLevels + numberOfSelectiveLevels, numberOfUniformLevels , SetRefinementFlag2); 
   
@@ -189,7 +189,7 @@ int main(int argc, char** args) {
   
   system.SetTolerances(1.e-50, 1.e-80, 1.e+50, 1, 1); //GMRES tolerances // 10 number of richardson iterations
   
-  system.SetFactorAndScale(true, 0.9);
+  system.SetFactorAndScale(false, 0.9);
   
   system.ClearVariablesToBeSolved();
   system.AddVariableToBeSolved("All");
