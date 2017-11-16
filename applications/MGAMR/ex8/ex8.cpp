@@ -108,7 +108,7 @@ int main(int argc, char** args) {
   unsigned dim = mlMsh.GetDimension();
 
   numberOfUniformLevels = 1;
-  unsigned numberOfSelectiveLevels = 5;
+  unsigned numberOfSelectiveLevels = 3;
   
   mlMsh.RefineMesh(numberOfUniformLevels + numberOfSelectiveLevels, numberOfUniformLevels , SetRefinementFlag); 
   
@@ -139,7 +139,7 @@ int main(int argc, char** args) {
   //system.SetMaxNumberOfResidualUpdatesForNonlinearIteration(10);
   //system.SetResidualUpdateConvergenceTolerance(1.e-15);
   
-  system.SetMaxNumberOfLinearIterations(2); // number of Vcycles
+  system.SetMaxNumberOfLinearIterations(1); // number of Vcycles
   system.SetAbsoluteLinearConvergenceTolerance(1.e-50);	
   
   system.SetMgType(V_CYCLE);
@@ -157,7 +157,7 @@ int main(int argc, char** args) {
   
   system.SetTolerances(1.e-50, 1.e-80, 1.e+50, 1, 1); //GMRES tolerances 
   
-  unsigned simulation = 4;
+  unsigned simulation = 0;
   double scale = 0.03;
   
   if (simulation  == 0){ //our theory
