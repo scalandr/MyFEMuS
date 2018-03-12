@@ -446,13 +446,13 @@ int main(int argc, char **args)
   std::cout << " TOTAL TIME:\t" << \
           static_cast<double>(clock() - start_time) / CLOCKS_PER_SEC << std::endl;
 	  
-//   int  nprocs;	    
-//   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-//   if(iproc == 0){
-//     char stdOutputName[100];
-//     sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_turek2D.txt",numberOfUniformRefinedMeshes, nprocs);
-//     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
-//   } 
+  int  nprocs;	    
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  if(iproc == 0){
+    char stdOutputName[100];
+    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_turek2D.txt",numberOfUniformRefinedMeshes, nprocs);
+    PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
+  } 
 	  
   return 0;
 }
@@ -723,6 +723,10 @@ bool SetBoundaryConditionVeinValve(const std::vector < double >& x, const char n
       //value = ( 5 - 3 * sin ( 2 * PI * time ) ) * ramp; //non runna
       value = (0 - 2 * sin(2 * PI * time)) * ramp;      //- 4.5
     }
+  }
+  else if(!strcmp(name, "PF")) {
+      test = 0;
+      value = 0;
   }
   else if(!strcmp(name, "DX")) {
     if(5 == facename) {
