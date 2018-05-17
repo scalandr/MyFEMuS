@@ -43,6 +43,9 @@ bool SetBoundaryConditionCarotidBifurcation ( const std::vector < double >& x, c
 bool SetBoundaryConditionMagneticStents ( const std::vector < double >& x, const char name[],
     double &value, const int facename, const double time );
 
+bool SetBoundaryConditionTurek2D(const std::vector < double >& x, const char name[],
+                                 double &value, const int facename, const double time);
+
 void UpdateMeshCoordinates ( MultiLevelMesh &mlMesh, MultiLevelSolution& mlSol );
 
 void MagneticForceWire ( const std::vector <double> & xMarker, std::vector <double> &Fm, const unsigned &material );
@@ -74,8 +77,11 @@ int main ( int argc, char **args )
     else if ( !strcmp ( "2", args[1] ) ) { /** FSI Carotid Bifurcation 3D*/
       simulation = 2;
     }
-    else if ( !strcmp ( "3", args[1] ) ) { /** FSI Carotid Bifurcation 3D*/
+    else if ( !strcmp ( "3", args[1] ) ) { /** FSI Magnetic Stents*/
       simulation = 3;
+    }
+    else if ( !strcmp ( "4", args[1] ) ) { /** FSI Turek2D no stents*/
+      simulation = 4;
     }
   }
 
@@ -103,7 +109,10 @@ int main ( int argc, char **args )
     dimension2D = false;
   }
   else if ( simulation == 3 ) {
-    infile = "./input/magnetic_stents_solidWires.neu";
+    infile = "./input/magnetic_stents.neu";
+  }
+  else if ( simulation == 4 ) {
+    infile = "./input/Turek.neu";
   }
 
 
@@ -124,13 +133,10 @@ int main ( int argc, char **args )
     //E = 1000;
     E = 1. * 1.e12 ;
   }
-  else if ( simulation == 2 ) { //carotide
+  else if ( simulation == 2 || simulation == 3 || simulation == 4 ) { //carotide
     //E = 1.e6 * 1.e6; //CFD case
     E = 1 * 1.e6; // FSI with E = 1 MPa
     //E = 0.5 * 1.e6; // FSI with E = 0.5 MPa
-  }
-  else if ( simulation == 3 ) { //magnetic_stents
-    E = 1. * 1.e6;
   }
   E1 = 1000;
 
@@ -155,7 +161,7 @@ int main ( int argc, char **args )
   // ******* Init multilevel mesh from mesh.neu file *******
   unsigned short numberOfUniformRefinedMeshes, numberOfAMRLevels;
 
-  numberOfUniformRefinedMeshes = 1;
+  numberOfUniformRefinedMeshes = 2;
   numberOfAMRLevels = 0;
 
   std::cout << 0 << std::endl;
@@ -222,6 +228,9 @@ int main ( int argc, char **args )
   else if ( simulation == 3 ) {
     ml_sol.AttachSetBoundaryConditionFunction ( SetBoundaryConditionMagneticStents );
   }
+  else if ( simulation == 4 ) {
+    ml_sol.AttachSetBoundaryConditionFunction ( SetBoundaryConditionTurek2D );
+  }
 
   // ******* Set boundary conditions *******
   ml_sol.GenerateBdc ( "DX", "Steady" );
@@ -242,7 +251,7 @@ int main ( int argc, char **args )
     ml_sol.GenerateBdc ( "V", "Steady" );
     ml_sol.GenerateBdc ( "W", "Time_dependent" );
   }
-  else  if ( simulation == 3 ) {
+  else  if ( simulation == 3 || simulation == 4 ) {
     ml_sol.GenerateBdc ( "U", "Time_dependent" );
     ml_sol.GenerateBdc ( "V", "Steady" );
   }
@@ -418,6 +427,18 @@ int main ( int argc, char **args )
       x[j][1] = a + j * h;
     }
   }
+  
+  if (simulation == 4) { //for Turek
+    double y0 = 0.007 - 0.0019 / 2;
+    double dy = 0.0019 / pSize;
+
+    for (unsigned j = 0; j < pSize; j++) {
+      x[j].resize(2);
+      x[j][0] = -0.00005;
+      x[j][1] = y0 + j * dy;
+      markerType[j] = VOLUME;
+    }
+  }
 
 //   std::cout << "SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCA" <<std::endl;
 
@@ -433,10 +454,6 @@ int main ( int argc, char **args )
   else if ( simulation == 2 ) {
     confNumber = 6;
     partSimMax = 8;
-  }
-  else if ( simulation == 3 ) {
-    confNumber = 1;
-    partSimMax = 1;
   }
   else {
     confNumber = 1;
@@ -500,17 +517,20 @@ int main ( int argc, char **args )
 
         count_out = 0;
 
-        if ( time_step >= 1. / itPeriod /*2.5*/ * itPeriod ) {
+        if ( time_step >= /*1. / itPeriod*/ /*2.5*/ 1. * itPeriod ) {
           for ( int i = 0; i < linea[configuration][partSim].size(); i++ ) {
             if ( simulation == 1 ) {
               linea[configuration][partSim][i]->AdvectionParallel ( 20, 1. / itPeriod, 4, MagneticForceWire );
             }
-            else if ( simulation == 0 || simulation == 2 ) {
+            else if ( simulation == 0 || simulation == 2 /*|| simulation == 4*/ ) {
               linea[configuration][partSim][i]->AdvectionParallel ( 150, 1. / itPeriod, 4, MagneticForceSC );
               //linea[configuration][partSim][i]->AdvectionParallel(75, 1. / itPeriod, 4, MagneticForceSC);
             }
             else if ( simulation == 3 ) {
               linea[configuration][partSim][i]->AdvectionParallel ( 150, 1. / itPeriod, 4, MagneticForceStents );
+            }
+            else if ( simulation == 4 ) {
+              linea[configuration][partSim][i]->AdvectionParallel ( 150, 1. / itPeriod, 4, NULL );
             }
             count_out += linea[configuration][partSim][i]->NumberOfParticlesOutsideTheDomain();
           }
@@ -814,6 +834,59 @@ bool SetBoundaryConditionMagneticStents ( const std::vector < double >& x, const
   }
 
   return test;
+}
+
+//-------------------------------------------------------------------------------
+
+bool SetBoundaryConditionTurek2D(const std::vector < double >& x, const char name[], double & value, const int facename, const double time)
+{
+  bool test = 1; //dirichlet
+  value = 0.;
+
+  double PI = acos(-1.);
+  if (!strcmp(name, "U")) {
+
+    if (1 == facename) {
+      double ramp = (time < 1) ? sin(PI / 2 * time) : 1.;
+      value = 0.05 * (x[1] * 1000 - 6) * (x[1] * 1000 - 8) * (1. + 0.75 * sin(2.*PI * time)) * ramp; //inflow
+      //value = 0.05 * (x[1] * 1000 - 6) * ( x[1] * 1000 - 8) * ramp; //inflow
+    }
+    else if (2 == facename || 5 == facename) {
+      test = 0;
+      value = 0.;
+    }
+  }
+  else if (!strcmp(name, "V")) {
+    if (2 == facename || 5 == facename) {
+      test = 0;
+      value = 0.;
+    }
+  }
+  else if (!strcmp(name, "PS")) {
+    test = 0;
+    value = 0.;
+  }
+  else if (!strcmp(name, "PF")) {
+    test = 0;
+    value = 0.;
+  }
+  else if (!strcmp(name, "DX")) {
+    //if(2 == facename || 4 == facename || 5 == facename || 6 == facename) {
+    if (5 == facename || 6 == facename) {
+      test = 0;
+      value = 0;
+    }
+  }
+  else if (!strcmp(name, "DY")) {
+    //if(1 == facename || 3 == facename || 5 == facename || 6 == facename) {
+    if (5 == facename || 6 == facename) {
+      test = 0;
+      value = 0;
+    }
+  }
+
+  return test;
+
 }
 
 //-------------------------------------------------------------------------------
