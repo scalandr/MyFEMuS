@@ -11,6 +11,7 @@
  **/
 
 #include "FemusInit.hpp"
+#include "MultiLevelSolution.hpp"
 #include "MultiLevelProblem.hpp"
 #include "NumericVector.hpp"
 #include "VTKWriter.hpp"
@@ -24,6 +25,7 @@ using namespace femus;
 bool SetBoundaryCondition(const std::vector < double >& x, const char SolName[], double& value, const int facename, const double time) {
   bool dirichlet = true; //dirichlet
   value = 0;
+  return dirichlet;
 }
 
 void AssembleBilaplaceProblem_AD(MultiLevelProblem& ml_prob);

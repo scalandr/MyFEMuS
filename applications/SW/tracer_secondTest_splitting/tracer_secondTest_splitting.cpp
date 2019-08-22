@@ -12,6 +12,7 @@
  **/
 
 #include "FemusInit.hpp"
+#include "MultiLevelSolution.hpp"
 #include "MultiLevelProblem.hpp"
 #include "VTKWriter.hpp"
 #include "GMVWriter.hpp"
@@ -64,8 +65,7 @@ const double hRest[40] = {0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 
 //                           0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125
 //                          };
 
-double InitalValueVi (const std::vector < double >& x , const unsigned &i)
-{
+double InitalValueVi (const std::vector < double >& x , const unsigned &i) {
   double psi1 = 1. - (x[0] - 5.) * (x[0] - 5.) * (x[0] - 5.) * (x[0] - 5.) / (5.*5.*5.*5.); //10x10 box test
   //double psi1 = 1. - (pow ( (x[0] - 20.), 16) / pow (20., 16));  //40x10 rectangle test
   //double psi1 = 1. - ( pow(( x[0] - 5. ), 2) / 25. );
@@ -83,335 +83,253 @@ double InitalValueVi (const std::vector < double >& x , const unsigned &i)
 //   return ( psi1 * d_psi2 );
 // }
 
-double InitalValueV0 (const std::vector < double >& x)
-{
+double InitalValueV0 (const std::vector < double >& x) {
   return InitalValueVi (x, 1);
 }
-double InitalValueV1 (const std::vector < double >& x)
-{
+double InitalValueV1 (const std::vector < double >& x) {
   return InitalValueVi (x, 2);
 }
-double InitalValueV2 (const std::vector < double >& x)
-{
+double InitalValueV2 (const std::vector < double >& x) {
   return InitalValueVi (x, 3);
 }
-double InitalValueV3 (const std::vector < double >& x)
-{
+double InitalValueV3 (const std::vector < double >& x) {
   return InitalValueVi (x, 4);
 }
-double InitalValueV4 (const std::vector < double >& x)
-{
+double InitalValueV4 (const std::vector < double >& x) {
   return InitalValueVi (x, 5);
 }
-double InitalValueV5 (const std::vector < double >& x)
-{
+double InitalValueV5 (const std::vector < double >& x) {
   return InitalValueVi (x, 6);
 }
-double InitalValueV6 (const std::vector < double >& x)
-{
+double InitalValueV6 (const std::vector < double >& x) {
   return InitalValueVi (x, 7);
 }
-double InitalValueV7 (const std::vector < double >& x)
-{
+double InitalValueV7 (const std::vector < double >& x) {
   return InitalValueVi (x, 8);
 }
-double InitalValueV8 (const std::vector < double >& x)
-{
+double InitalValueV8 (const std::vector < double >& x) {
   return InitalValueVi (x, 9);
 }
-double InitalValueV9 (const std::vector < double >& x)
-{
+double InitalValueV9 (const std::vector < double >& x) {
   return InitalValueVi (x, 10);
 }
-double InitalValueV10 (const std::vector < double >& x)
-{
+double InitalValueV10 (const std::vector < double >& x) {
   return InitalValueVi (x, 11);
 }
-double InitalValueV11 (const std::vector < double >& x)
-{
+double InitalValueV11 (const std::vector < double >& x) {
   return InitalValueVi (x, 12);
 }
-double InitalValueV12 (const std::vector < double >& x)
-{
+double InitalValueV12 (const std::vector < double >& x) {
   return InitalValueVi (x, 13);
 }
-double InitalValueV13 (const std::vector < double >& x)
-{
+double InitalValueV13 (const std::vector < double >& x) {
   return InitalValueVi (x, 14);
 }
-double InitalValueV14 (const std::vector < double >& x)
-{
+double InitalValueV14 (const std::vector < double >& x) {
   return InitalValueVi (x, 15);
 }
-double InitalValueV15 (const std::vector < double >& x)
-{
+double InitalValueV15 (const std::vector < double >& x) {
   return InitalValueVi (x, 16);
 }
-double InitalValueV16 (const std::vector < double >& x)
-{
+double InitalValueV16 (const std::vector < double >& x) {
   return InitalValueVi (x, 17);
 }
-double InitalValueV17 (const std::vector < double >& x)
-{
+double InitalValueV17 (const std::vector < double >& x) {
   return InitalValueVi (x, 18);
 }
-double InitalValueV18 (const std::vector < double >& x)
-{
+double InitalValueV18 (const std::vector < double >& x) {
   return InitalValueVi (x, 19);
 }
-double InitalValueV19 (const std::vector < double >& x)
-{
+double InitalValueV19 (const std::vector < double >& x) {
   return InitalValueVi (x, 20);
 }
-double InitalValueV20 (const std::vector < double >& x)
-{
+double InitalValueV20 (const std::vector < double >& x) {
   return InitalValueVi (x, 21);
 }
-double InitalValueV21 (const std::vector < double >& x)
-{
+double InitalValueV21 (const std::vector < double >& x) {
   return InitalValueVi (x, 22);
 }
-double InitalValueV22 (const std::vector < double >& x)
-{
+double InitalValueV22 (const std::vector < double >& x) {
   return InitalValueVi (x, 23);
 }
-double InitalValueV23 (const std::vector < double >& x)
-{
+double InitalValueV23 (const std::vector < double >& x) {
   return InitalValueVi (x, 24);
 }
-double InitalValueV24 (const std::vector < double >& x)
-{
+double InitalValueV24 (const std::vector < double >& x) {
   return InitalValueVi (x, 25);
 }
-double InitalValueV25 (const std::vector < double >& x)
-{
+double InitalValueV25 (const std::vector < double >& x) {
   return InitalValueVi (x, 26);
 }
-double InitalValueV26 (const std::vector < double >& x)
-{
+double InitalValueV26 (const std::vector < double >& x) {
   return InitalValueVi (x, 27);
 }
-double InitalValueV27 (const std::vector < double >& x)
-{
+double InitalValueV27 (const std::vector < double >& x) {
   return InitalValueVi (x, 28);
 }
-double InitalValueV28 (const std::vector < double >& x)
-{
+double InitalValueV28 (const std::vector < double >& x) {
   return InitalValueVi (x, 29);
 }
-double InitalValueV29 (const std::vector < double >& x)
-{
+double InitalValueV29 (const std::vector < double >& x) {
   return InitalValueVi (x, 30);
 }
-double InitalValueV30 (const std::vector < double >& x)
-{
+double InitalValueV30 (const std::vector < double >& x) {
   return InitalValueVi (x, 31);
 }
-double InitalValueV31 (const std::vector < double >& x)
-{
+double InitalValueV31 (const std::vector < double >& x) {
   return InitalValueVi (x, 32);
 }
-double InitalValueV32 (const std::vector < double >& x)
-{
+double InitalValueV32 (const std::vector < double >& x) {
   return InitalValueVi (x, 33);
 }
-double InitalValueV33 (const std::vector < double >& x)
-{
+double InitalValueV33 (const std::vector < double >& x) {
   return InitalValueVi (x, 34);
 }
-double InitalValueV34 (const std::vector < double >& x)
-{
+double InitalValueV34 (const std::vector < double >& x) {
   return InitalValueVi (x, 35);
 }
-double InitalValueV35 (const std::vector < double >& x)
-{
+double InitalValueV35 (const std::vector < double >& x) {
   return InitalValueVi (x, 36);
 }
-double InitalValueV36 (const std::vector < double >& x)
-{
+double InitalValueV36 (const std::vector < double >& x) {
   return InitalValueVi (x, 37);
 }
-double InitalValueV37 (const std::vector < double >& x)
-{
+double InitalValueV37 (const std::vector < double >& x) {
   return InitalValueVi (x, 38);
 }
-double InitalValueV38 (const std::vector < double >& x)
-{
+double InitalValueV38 (const std::vector < double >& x) {
   return InitalValueVi (x, 39);
 }
-double InitalValueV39 (const std::vector < double >& x)
-{
+double InitalValueV39 (const std::vector < double >& x) {
   return InitalValueVi (x, 40);
 }
-double InitalValueV40 (const std::vector < double >& x)
-{
+double InitalValueV40 (const std::vector < double >& x) {
   return InitalValueVi (x, 41);
 }
-double InitalValueV41 (const std::vector < double >& x)
-{
+double InitalValueV41 (const std::vector < double >& x) {
   return InitalValueVi (x, 42);
 }
-double InitalValueV42 (const std::vector < double >& x)
-{
+double InitalValueV42 (const std::vector < double >& x) {
   return InitalValueVi (x, 43);
 }
-double InitalValueV43 (const std::vector < double >& x)
-{
+double InitalValueV43 (const std::vector < double >& x) {
   return InitalValueVi (x, 44);
 }
-double InitalValueV44 (const std::vector < double >& x)
-{
+double InitalValueV44 (const std::vector < double >& x) {
   return InitalValueVi (x, 45);
 }
-double InitalValueV45 (const std::vector < double >& x)
-{
+double InitalValueV45 (const std::vector < double >& x) {
   return InitalValueVi (x, 46);
 }
-double InitalValueV46 (const std::vector < double >& x)
-{
+double InitalValueV46 (const std::vector < double >& x) {
   return InitalValueVi (x, 47);
 }
-double InitalValueV47 (const std::vector < double >& x)
-{
+double InitalValueV47 (const std::vector < double >& x) {
   return InitalValueVi (x, 48);
 }
-double InitalValueV48 (const std::vector < double >& x)
-{
+double InitalValueV48 (const std::vector < double >& x) {
   return InitalValueVi (x, 49);
 }
-double InitalValueV49 (const std::vector < double >& x)
-{
+double InitalValueV49 (const std::vector < double >& x) {
   return InitalValueVi (x, 50);
 }
-double InitalValueV50 (const std::vector < double >& x)
-{
+double InitalValueV50 (const std::vector < double >& x) {
   return InitalValueVi (x, 51);
 }
-double InitalValueV51 (const std::vector < double >& x)
-{
+double InitalValueV51 (const std::vector < double >& x) {
   return InitalValueVi (x, 52);
 }
-double InitalValueV52 (const std::vector < double >& x)
-{
+double InitalValueV52 (const std::vector < double >& x) {
   return InitalValueVi (x, 53);
 }
-double InitalValueV53 (const std::vector < double >& x)
-{
+double InitalValueV53 (const std::vector < double >& x) {
   return InitalValueVi (x, 54);
 }
-double InitalValueV54 (const std::vector < double >& x)
-{
+double InitalValueV54 (const std::vector < double >& x) {
   return InitalValueVi (x, 55);
 }
-double InitalValueV55 (const std::vector < double >& x)
-{
+double InitalValueV55 (const std::vector < double >& x) {
   return InitalValueVi (x, 56);
 }
-double InitalValueV56 (const std::vector < double >& x)
-{
+double InitalValueV56 (const std::vector < double >& x) {
   return InitalValueVi (x, 57);
 }
-double InitalValueV57 (const std::vector < double >& x)
-{
+double InitalValueV57 (const std::vector < double >& x) {
   return InitalValueVi (x, 58);
 }
-double InitalValueV58 (const std::vector < double >& x)
-{
+double InitalValueV58 (const std::vector < double >& x) {
   return InitalValueVi (x, 59);
 }
-double InitalValueV59 (const std::vector < double >& x)
-{
+double InitalValueV59 (const std::vector < double >& x) {
   return InitalValueVi (x, 60);
 }
-double InitalValueV60 (const std::vector < double >& x)
-{
+double InitalValueV60 (const std::vector < double >& x) {
   return InitalValueVi (x, 61);
 }
-double InitalValueV61 (const std::vector < double >& x)
-{
+double InitalValueV61 (const std::vector < double >& x) {
   return InitalValueVi (x, 62);
 }
-double InitalValueV62 (const std::vector < double >& x)
-{
+double InitalValueV62 (const std::vector < double >& x) {
   return InitalValueVi (x, 63);
 }
-double InitalValueV63 (const std::vector < double >& x)
-{
+double InitalValueV63 (const std::vector < double >& x) {
   return InitalValueVi (x, 64);
 }
-double InitalValueV64 (const std::vector < double >& x)
-{
+double InitalValueV64 (const std::vector < double >& x) {
   return InitalValueVi (x, 65);
 }
-double InitalValueV65 (const std::vector < double >& x)
-{
+double InitalValueV65 (const std::vector < double >& x) {
   return InitalValueVi (x, 66);
 }
-double InitalValueV66 (const std::vector < double >& x)
-{
+double InitalValueV66 (const std::vector < double >& x) {
   return InitalValueVi (x, 67);
 }
-double InitalValueV67 (const std::vector < double >& x)
-{
+double InitalValueV67 (const std::vector < double >& x) {
   return InitalValueVi (x, 68);
 }
-double InitalValueV68 (const std::vector < double >& x)
-{
+double InitalValueV68 (const std::vector < double >& x) {
   return InitalValueVi (x, 69);
 }
-double InitalValueV69 (const std::vector < double >& x)
-{
+double InitalValueV69 (const std::vector < double >& x) {
   return InitalValueVi (x, 70);
 }
-double InitalValueV70 (const std::vector < double >& x)
-{
+double InitalValueV70 (const std::vector < double >& x) {
   return InitalValueVi (x, 71);
 }
-double InitalValueV71 (const std::vector < double >& x)
-{
+double InitalValueV71 (const std::vector < double >& x) {
   return InitalValueVi (x, 72);
 }
-double InitalValueV72 (const std::vector < double >& x)
-{
+double InitalValueV72 (const std::vector < double >& x) {
   return InitalValueVi (x, 73);
 }
-double InitalValueV73 (const std::vector < double >& x)
-{
+double InitalValueV73 (const std::vector < double >& x) {
   return InitalValueVi (x, 74);
 }
-double InitalValueV74 (const std::vector < double >& x)
-{
+double InitalValueV74 (const std::vector < double >& x) {
   return InitalValueVi (x, 75);
 }
-double InitalValueV75 (const std::vector < double >& x)
-{
+double InitalValueV75 (const std::vector < double >& x) {
   return InitalValueVi (x, 76);
 }
-double InitalValueV76 (const std::vector < double >& x)
-{
+double InitalValueV76 (const std::vector < double >& x) {
   return InitalValueVi (x, 77);
 }
-double InitalValueV77 (const std::vector < double >& x)
-{
+double InitalValueV77 (const std::vector < double >& x) {
   return InitalValueVi (x, 78);
 }
-double InitalValueV78 (const std::vector < double >& x)
-{
+double InitalValueV78 (const std::vector < double >& x) {
   return InitalValueVi (x, 79);
 }
-double InitalValueV79 (const std::vector < double >& x)
-{
+double InitalValueV79 (const std::vector < double >& x) {
   return InitalValueVi (x, 80);
 }
 
 
-double InitalValueH (const std::vector < double >& x)
-{
+double InitalValueH (const std::vector < double >& x) {
   return hRest[0];
 }
 
-double InitalValueT (const std::vector < double >& x)
-{
+double InitalValueT (const std::vector < double >& x) {
   double pi = acos (-1.);
 
   if (x[0] < 5.) {
@@ -426,14 +344,12 @@ double InitalValueT (const std::vector < double >& x)
 }
 
 
-double InitalValueB (const std::vector < double >& x)
-{
+double InitalValueB (const std::vector < double >& x) {
   return 10.; //( H_shelf + H_0 / 2 * (1 + tanh(hh / phi)) );
 }
 
 
-bool SetBoundaryCondition (const std::vector < double >& x, const char SolName[], double& value, const int facename, const double time)
-{
+bool SetBoundaryCondition (const std::vector < double >& x, const char SolName[], double& value, const int facename, const double time) {
   bool dirichlet = false;
 
   if (!strcmp (SolName, "HT")) {
@@ -463,8 +379,7 @@ void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector < std::vector < double > > &phi1A);
 
 
-int main (int argc, char** args)
-{
+int main (int argc, char** args) {
 
   SlepcInitialize (&argc, &args, PETSC_NULL, PETSC_NULL);
 
@@ -497,18 +412,18 @@ int main (int argc, char** args)
   for (unsigned i = 0; i < NumberOfLayers; i++) {
     char name[10];
     sprintf (name, "h%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "v%d", i);
     mlSol.AddSolution (name, LAGRANGE, FIRST, 2);
     sprintf (name, "T%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HT%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
   }
 
-  mlSol.AddSolution ("b", DISCONTINOUS_POLYNOMIAL, ZERO, 1, false);
+  mlSol.AddSolution ("b", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
 
-  mlSol.AddSolution ("eta", DISCONTINOUS_POLYNOMIAL, ZERO, 1, false);
+  mlSol.AddSolution ("eta", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
 
   mlSol.Initialize ("All");
 
@@ -625,6 +540,109 @@ int main (int argc, char** args)
     system.AddSolutionToSystemPDE (name);
   }
 
+  for (unsigned i = 0; i < NumberOfLayers; i++) {
+    char name[10];
+    sprintf (name, "h%d", i);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
+    sprintf (name, "v%d", i);
+    mlSol.AddSolution (name, LAGRANGE, FIRST, 2);
+    sprintf (name, "T%d", i);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
+    sprintf (name, "HT%d", i);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
+  }
+
+  mlSol.AddSolution ("b", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
+
+  mlSol.AddSolution ("eta", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
+
+  mlSol.Initialize ("All");
+
+  mlSol.Initialize ("v0", InitalValueV0);
+  mlSol.Initialize ("v1", InitalValueV1);
+  mlSol.Initialize ("v2", InitalValueV2);
+  mlSol.Initialize ("v3", InitalValueV3);
+  mlSol.Initialize ("v4", InitalValueV4);
+  mlSol.Initialize ("v5", InitalValueV5);
+  mlSol.Initialize ("v6", InitalValueV6);
+  mlSol.Initialize ("v7", InitalValueV7);
+  mlSol.Initialize ("v8", InitalValueV8);
+  mlSol.Initialize ("v9", InitalValueV9);
+  mlSol.Initialize ("v10", InitalValueV10);
+  mlSol.Initialize ("v11", InitalValueV11);
+  mlSol.Initialize ("v12", InitalValueV12);
+  mlSol.Initialize ("v13", InitalValueV13);
+  mlSol.Initialize ("v14", InitalValueV14);
+  mlSol.Initialize ("v15", InitalValueV15);
+  mlSol.Initialize ("v16", InitalValueV16);
+  mlSol.Initialize ("v17", InitalValueV17);
+  mlSol.Initialize ("v18", InitalValueV18);
+  mlSol.Initialize ("v19", InitalValueV19);
+  if (NumberOfLayers > 39) {
+    mlSol.Initialize ("v20", InitalValueV20);
+    mlSol.Initialize ("v21", InitalValueV21);
+    mlSol.Initialize ("v22", InitalValueV22);
+    mlSol.Initialize ("v23", InitalValueV23);
+    mlSol.Initialize ("v24", InitalValueV24);
+    mlSol.Initialize ("v25", InitalValueV25);
+    mlSol.Initialize ("v26", InitalValueV26);
+    mlSol.Initialize ("v27", InitalValueV27);
+    mlSol.Initialize ("v28", InitalValueV28);
+    mlSol.Initialize ("v29", InitalValueV29);
+    mlSol.Initialize ("v30", InitalValueV30);
+    mlSol.Initialize ("v31", InitalValueV31);
+    mlSol.Initialize ("v32", InitalValueV32);
+    mlSol.Initialize ("v33", InitalValueV33);
+    mlSol.Initialize ("v34", InitalValueV34);
+    mlSol.Initialize ("v35", InitalValueV35);
+    mlSol.Initialize ("v36", InitalValueV36);
+    mlSol.Initialize ("v37", InitalValueV37);
+    mlSol.Initialize ("v38", InitalValueV38);
+    mlSol.Initialize ("v39", InitalValueV39);
+    if (NumberOfLayers > 79) {
+      mlSol.Initialize ("v40", InitalValueV40);
+      mlSol.Initialize ("v41", InitalValueV41);
+      mlSol.Initialize ("v42", InitalValueV42);
+      mlSol.Initialize ("v43", InitalValueV43);
+      mlSol.Initialize ("v44", InitalValueV44);
+      mlSol.Initialize ("v45", InitalValueV45);
+      mlSol.Initialize ("v46", InitalValueV46);
+      mlSol.Initialize ("v47", InitalValueV47);
+      mlSol.Initialize ("v48", InitalValueV48);
+      mlSol.Initialize ("v49", InitalValueV49);
+      mlSol.Initialize ("v50", InitalValueV50);
+      mlSol.Initialize ("v51", InitalValueV51);
+      mlSol.Initialize ("v52", InitalValueV52);
+      mlSol.Initialize ("v53", InitalValueV53);
+      mlSol.Initialize ("v54", InitalValueV54);
+      mlSol.Initialize ("v55", InitalValueV55);
+      mlSol.Initialize ("v56", InitalValueV56);
+      mlSol.Initialize ("v57", InitalValueV57);
+      mlSol.Initialize ("v58", InitalValueV58);
+      mlSol.Initialize ("v59", InitalValueV59);
+      mlSol.Initialize ("v60", InitalValueV60);
+      mlSol.Initialize ("v61", InitalValueV61);
+      mlSol.Initialize ("v62", InitalValueV62);
+      mlSol.Initialize ("v63", InitalValueV63);
+      mlSol.Initialize ("v64", InitalValueV64);
+      mlSol.Initialize ("v65", InitalValueV65);
+      mlSol.Initialize ("v66", InitalValueV66);
+      mlSol.Initialize ("v67", InitalValueV67);
+      mlSol.Initialize ("v68", InitalValueV68);
+      mlSol.Initialize ("v69", InitalValueV69);
+      mlSol.Initialize ("v70", InitalValueV70);
+      mlSol.Initialize ("v71", InitalValueV71);
+      mlSol.Initialize ("v72", InitalValueV72);
+      mlSol.Initialize ("v73", InitalValueV73);
+      mlSol.Initialize ("v74", InitalValueV74);
+      mlSol.Initialize ("v75", InitalValueV75);
+      mlSol.Initialize ("v76", InitalValueV76);
+      mlSol.Initialize ("v77", InitalValueV77);
+      mlSol.Initialize ("v78", InitalValueV78);
+      mlSol.Initialize ("v79", InitalValueV79);
+    }
+  }
+
   system.init();
 
   mlSol.SetWriter (VTK);
@@ -655,8 +673,7 @@ int main (int argc, char** args)
 }
 
 
-void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
-{
+void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps) {
 
   const unsigned& NLayers = NumberOfLayers;
 
@@ -745,8 +762,8 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
   std::vector < double > N (NLayers * (end - start), 0.);
 
   std::vector < std::vector < double > > Jac (end - start);
-  if(constant_jac){
-    if (counter==0) phi1A.resize (end - start);
+  if (constant_jac) {
+    if (counter == 0) phi1A.resize (end - start);
   }
 
   for (unsigned i =  start; i <  end; i++) {
@@ -1164,12 +1181,12 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
     }
 
     else {
-      
+
       unsigned CFL_pow = 2;
       //MatScale (A, dt / pow (2, CFL_pow));
 
-      if (constant_jac){
-        if (counter==0) create_phi1A(CFL_pow, Jac[i], phi1A[i]);
+      if (constant_jac) {
+        if (counter == 0) create_phi1A (CFL_pow, Jac[i], phi1A[i]);
         for (int ii = 0; ii < NumberOfLayers; ii++) {
           double value = 0.;
           for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
@@ -1181,12 +1198,12 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
         VecAssemblyEnd (y);
         VecScale (y, dt);
       }
-      else{
+      else {
         build_phi1Av (CFL_pow, Jac[i], Res, y);
         VecScale (y, dt);
       }
       //VecView (y, PETSC_VIEWER_STDOUT_WORLD);
-      
+
     }
 
     std::vector<double> EPS_local (NLayers);
@@ -1524,11 +1541,11 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
       }
 
       else {
-        
+
         unsigned CFL_pow = 2;
         //MatScale (A, dt / pow (2, CFL_pow));
 
-        if(constant_jac){
+        if (constant_jac) {
           for (int ii = 0; ii < NumberOfLayers; ii++) {
             double value = 0.;
             for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
@@ -1540,12 +1557,12 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
           VecAssemblyEnd (y);
           VecScale (y, 0.5 * dt);
         }
-        else{
+        else {
           build_phi1Av (CFL_pow, Jac[i], aResHT, y);
           VecScale (y, 0.5 * dt);
         }
         //VecView (y, PETSC_VIEWER_STDOUT_WORLD);
-        
+
       }
 
       std::vector<double> EPS_local (NLayers);
@@ -1604,8 +1621,7 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps)
 }
 
 
-void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned & numberOfTimeSteps)
-{
+void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned & numberOfTimeSteps) {
 
   const unsigned& NLayers = NumberOfLayers;
 
@@ -2165,8 +2181,7 @@ void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned
 
 }
 
-void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y)
-{
+void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y) {
 
 //   std::cout << "scaling factor = " << (dt / pow (2, CFL_pow)) << std::endl;
 
@@ -2363,8 +2378,7 @@ void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 
 }
 
-void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector< std::vector <double > > &phi1A)
-{
+void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector< std::vector <double > > &phi1A) {
 
 //   std::cout << "scaling factor = " << (dt / pow (2, CFL_pow)) << std::endl;
 

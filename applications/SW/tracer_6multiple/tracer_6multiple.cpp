@@ -13,6 +13,7 @@
  **/
 
 #include "FemusInit.hpp"
+#include "MultiLevelSolution.hpp"
 #include "MultiLevelProblem.hpp"
 #include "VTKWriter.hpp"
 #include "GMVWriter.hpp"
@@ -555,38 +556,38 @@ int main (int argc, char** args)
   for (unsigned i = 0; i < NumberOfLayers; i++) {
     char name[10];
     sprintf (name, "h%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "v%d", i);
     mlSol.AddSolution (name, LAGRANGE, FIRST, 2);
     sprintf (name, "T%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HT%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "S%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HS%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "Z%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HZ%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "C%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HC%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "D%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HD%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "E%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
     sprintf (name, "HE%d", i);
-    mlSol.AddSolution (name, DISCONTINOUS_POLYNOMIAL, ZERO, 2);
+    mlSol.AddSolution (name, DISCONTINUOUS_POLYNOMIAL, ZERO, 2);
   }
 
-  mlSol.AddSolution ("b", DISCONTINOUS_POLYNOMIAL, ZERO, 1, false);
+  mlSol.AddSolution ("b", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
 
-  mlSol.AddSolution ("eta", DISCONTINOUS_POLYNOMIAL, ZERO, 1, false);
+  mlSol.AddSolution ("eta", DISCONTINUOUS_POLYNOMIAL, ZERO, 1, false);
 
   mlSol.Initialize ("All");
 

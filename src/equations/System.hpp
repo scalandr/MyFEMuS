@@ -19,8 +19,8 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "MultiLevelProblem.hpp"
 #include "MgTypeEnum.hpp"
+#include "LinearEquationSolverEnum.hpp"
 #include "FieldSplitTree.hpp"
 
 
@@ -31,6 +31,7 @@ namespace femus {
 //------------------------------------------------------------------------------
 class System;
 class MultiLevelProblem;
+class MultiLevelMesh;
 class String;
 
 /**
@@ -47,7 +48,7 @@ protected:
 public:
 
     /** Constructor.  Optionally initializes required data structures. */
-    System (MultiLevelProblem& ml_prob, const std::string& name, const unsigned int number, const MgSmoother & smoother_type);
+    System (MultiLevelProblem& ml_prob, const std::string& name, const unsigned int number, const LinearEquationSolverType & smoother_type);
 
     /** destructor */
     virtual ~System();
@@ -71,30 +72,18 @@ public:
     void AddSolutionToSystemPDEVector(const unsigned n_components,  const std::string name);
 
     /** Associate the solution variables to the system PDE */
-    void AddSolutionToSystemPDE(const char solname[]);
+    virtual void AddSolutionToSystemPDE(const char solname[]);
 
     /** Register a user function to use in assembling the system matrix and RHS. */
     void SetAssembleFunction (AssembleFunctionType );
 
     AssembleFunctionType  GetAssembleFunction();
 
-
+    virtual void SetOuterSolver (const SolverType & mgOuterSolver) {};
+    
     virtual void MGsolve (const MgSmootherType& mgSmootherType = MULTIPLICATIVE){
-      _solverType = "MultiGrid";
-      _MLsolver = false;
-      _MGsolver = true;
-      solve(mgSmootherType);
+      //solve(mgSmootherType);
     };
-
-    virtual void MLsolve (){
-      _solverType = "MultiLevel";
-      _MLsolver = true;
-      _MGsolver = false;
-      solve();
-    };
-
-    /** Clear all the data structures associated with the system. */
-    virtual void clear();
 
     /** Init the system PDE structures */
     virtual void init();
@@ -105,7 +94,11 @@ public:
     /** Get the index of the Solution "solname" for this system */
     unsigned GetSolPdeIndex(const char solname[]);
     
-    vector <unsigned> & GetSolPdeIndex(){
+    vector <unsigned> & GetSolPdeIndex() {
+      return _SolSystemPdeIndex;
+    }
+
+    const vector <unsigned> & GetSolPdeIndex() const {
       return _SolSystemPdeIndex;
     }
 
@@ -118,9 +111,9 @@ public:
     /** Get Number of Levels */
     inline const unsigned GetGridn() const { return _gridn; }
 
-    inline unsigned GetLevelToAssemble(){ return _levelToAssemble; }
+    inline unsigned GetLevelToAssemble() const { return _levelToAssemble; }
 
-    inline unsigned SetLevelToAssemble(const unsigned &level){ _levelToAssemble = level; }
+    inline void SetLevelToAssemble(const unsigned &level){ _levelToAssemble = level; }
 
 protected:
 
@@ -147,10 +140,7 @@ protected:
 
     unsigned _levelToAssemble;
 
-    bool _MGsolver, _MLsolver;
-    std::string _solverType;
-
-    virtual void solve( const MgSmootherType& mgSmootherType = MULTIPLICATIVE ){};
+    //virtual void solve( const MgSmootherType& mgSmootherType = MULTIPLICATIVE ){};
 
     /** Function that assembles the system. */
     AssembleFunctionType _assemble_system_function;
