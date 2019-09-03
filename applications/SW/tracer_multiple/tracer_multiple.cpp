@@ -786,7 +786,7 @@ int main (int argc, char** args)
   //mlSol.GetWriter()->SetDebugOutput(true);
   mlSol.GetWriter()->Write (DEFAULT_OUTPUTDIR, "linear", print_vars, 0);
 
-  unsigned numberOfTimeSteps = 20; //17h=1020 with dt=60, 17h=10200 with dt=6
+  unsigned numberOfTimeSteps = 100; //17h=1020 with dt=60, 17h=10200 with dt=6
   dt = 3.;
   bool implicitEuler = true;
 
@@ -3018,8 +3018,8 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   MatAssemblyBegin (A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd (A, MAT_FINAL_ASSEMBLY);
 
-  MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AA);
-  MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AAA);
+  //MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AA);
+  //MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AAA);
   MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &phi1APetsc);
 
   for (k1 = 0; k1 < NumberOfLayers; k1++) {
@@ -3048,8 +3048,8 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 
     Mat Temp;
     Mat Temp2;
-    MatDuplicate (phi1APetsc, MAT_DO_NOT_COPY_VALUES, &Temp);
-    MatDuplicate (phi1APetsc, MAT_DO_NOT_COPY_VALUES, &Temp2);
+    //MatDuplicate (phi1APetsc, MAT_DO_NOT_COPY_VALUES, &Temp);
+    //MatDuplicate (phi1APetsc, MAT_DO_NOT_COPY_VALUES, &Temp2);
 
     MatMatMult (phi1APetsc, phi1APetsc, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Temp);
 
