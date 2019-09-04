@@ -43,7 +43,7 @@ unsigned counter2 = 0;
 
 clock_t start_time = clock();
 
-bool phi_once = false;
+bool phi_once = true;
 bool constant_jac = false;
 bool twostage = true;
 bool assembly = true; //assembly must be left always true
@@ -565,15 +565,15 @@ bool SetBoundaryCondition (const std::vector < double >& x, const char SolName[]
 }
 
 
-void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &JacScaled, Mat &phi1APetsc, Mat &AA, Mat &AAA);
+void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &JacScaled, Mat &phi1APetsc, Mat &Temp, Mat &Temp2);
 
 void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned & numberOfTimeSteps);
 
 void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y, Mat &A, Mat &phi1APetsc, 
-                   Mat &AA, Mat &AAA);
+                   Mat &Temp, Mat &Temp2);
 
 void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector < std::vector < double > > &phi1A, Mat &A, Mat &phi1APetsc, 
-                   Mat &AA, Mat &AAA);
+                   Mat &Temp, Mat &Temp2);
 
 
 int main (int argc, char** args)
@@ -794,12 +794,12 @@ int main (int argc, char** args)
   
   Mat JacScaled;
   Mat phi1APetsc; 
-  Mat AA;
-  Mat AAA;
+  Mat Temp;
+  Mat Temp2;
   MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &JacScaled);
   MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &phi1APetsc);
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &AA);
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &AAA);
+  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp);
+  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp2);
 
   for (unsigned i = 0; i < numberOfTimeSteps; i++) {
     if (constant_jac == true) {
@@ -807,7 +807,7 @@ int main (int argc, char** args)
     }
     counter = i;
     system.CopySolutionToOldSolution();
-    ETD (ml_prob, numberOfTimeSteps, JacScaled, phi1APetsc, AA, AAA);
+    ETD (ml_prob, numberOfTimeSteps, JacScaled, phi1APetsc, Temp, Temp2);
     //RK4 ( ml_prob, implicitEuler, numberOfTimeSteps );
     mlSol.GetWriter()->Write (DEFAULT_OUTPUTDIR, "linear", print_vars, (i + 1) / 1);
     counter2++;
@@ -815,8 +815,8 @@ int main (int argc, char** args)
   
   MatDestroy (&JacScaled);
   MatDestroy (&phi1APetsc);
-  MatDestroy (&AA);
-  MatDestroy (&AAA);
+  MatDestroy (&Temp);
+  MatDestroy (&Temp2);
 
   std::cout << " TOTAL TIME:\t" <<
             static_cast<double> (clock() - start_time) / CLOCKS_PER_SEC << std::endl;
@@ -824,7 +824,7 @@ int main (int argc, char** args)
 }
 
 
-void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &JacScaled, Mat &phi1APetsc, Mat &AA, Mat &AAA)
+void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &JacScaled, Mat &phi1APetsc, Mat &Temp, Mat &Temp2)
 {
 
   const unsigned& NLayers = NumberOfLayers;
@@ -1486,7 +1486,7 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
       //MatScale (A, dt / pow (2, CFL_pow));
 
       if (constant_jac) {
-        if (counter == 0) create_phi1A (CFL_pow, Jac[i], phi1A[i], JacScaled, phi1APetsc, AA, AAA);
+        if (counter == 0) create_phi1A (CFL_pow, Jac[i], phi1A[i], JacScaled, phi1APetsc, Temp, Temp2);
 
         for (int ii = 0; ii < NumberOfLayers; ii++) {
           double value1 = 0.; //tracer 1 
@@ -1519,7 +1519,7 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
       else if (phi_once) {
         clock_t phi1A_time = clock();
-        create_phi1A (CFL_pow, Jac[i], phi1A[i], JacScaled, phi1APetsc, AA, AAA);
+        create_phi1A (CFL_pow, Jac[i], phi1A[i], JacScaled, phi1APetsc, Temp, Temp2);
         //std::cout << " phi1A TIME :\t" << static_cast<double> (clock() - phi1A_time) / CLOCKS_PER_SEC << std::endl;
 
 //         clock_t mult_time = clock();
@@ -1557,13 +1557,13 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
       else {
         //tracer 1
-        build_phi1Av (CFL_pow, Jac[i], Res, y1, JacScaled, phi1APetsc, AA, AAA);
+        build_phi1Av (CFL_pow, Jac[i], Res, y1, JacScaled, phi1APetsc, Temp, Temp2);
         VecScale (y1, dt);
 //         //tracer 2
-//         build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, AA, AAA);
+//         build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, Temp, Temp2);
 //         VecScale (y2, dt);
 //         //tracer 3
-//         build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, AA, AAA);
+//         build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, Temp, Temp2);
 //         VecScale (y3, dt);
       }
 
@@ -2029,13 +2029,13 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
         else {
           //tracer 1
-          build_phi1Av (CFL_pow, Jac[i], aResHT, y1, JacScaled, phi1APetsc, AA, AAA);
+          build_phi1Av (CFL_pow, Jac[i], aResHT, y1, JacScaled, phi1APetsc, Temp, Temp2);
           VecScale (y1, 0.5 * dt);
 //           //tracer 2
-//           build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, AA, AAA);
+//           build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, Temp, Temp2);
 //           VecScale (y2, 0.5 * dt);
 //           //tracer 3
-//           build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, AA, AAA);
+//           build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, Temp, Temp2);
 //           VecScale (y3, 0.5 * dt);
         }
 
@@ -2695,7 +2695,7 @@ void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned
 }
 
 void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y, Mat &A, Mat &phi1APetsc, 
-                   Mat &AA, Mat &AAA)
+                   Mat &Temp, Mat &Temp2)
 {
 
   //BEGIN IMPLEMENTATION WITH FOR CYCLES 
@@ -2853,20 +2853,15 @@ void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   MatAssemblyBegin (phi1APetsc, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd (phi1APetsc, MAT_FINAL_ASSEMBLY);
 
-  MatMatMult (A, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AA);
+  MatMatMult (A, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp);
   
-  MatMatMult (AA, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AAA);
+  MatMatMult (Temp, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp2);
 
   MatAXPY (phi1APetsc, 1. / 2., A, DIFFERENT_NONZERO_PATTERN);
 
-  MatAXPY (phi1APetsc, 1. / 6., AA, DIFFERENT_NONZERO_PATTERN);
+  MatAXPY (phi1APetsc, 1. / 6., Temp, DIFFERENT_NONZERO_PATTERN);
 
-  MatAXPY (phi1APetsc, 1. / 24., AAA, DIFFERENT_NONZERO_PATTERN);
-  
-  Mat Temp;
-  Mat Temp2;
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp);
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp2);
+  MatAXPY (phi1APetsc, 1. / 24., Temp2, DIFFERENT_NONZERO_PATTERN);
 
   for (unsigned i = 0; i < CFL_pow; i++) {
 
@@ -2896,8 +2891,6 @@ void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   
   MatMult (phi1APetsc, v, y);
   
-  MatDestroy (&Temp);
-  MatDestroy (&Temp2);
   VecDestroy (&v);
 
   //END PETSC NEW
@@ -2905,19 +2898,19 @@ void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 }
 
 void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector< std::vector <double > > &phi1A, Mat &A, Mat &phi1APetsc,
-                   Mat &AA, Mat &AAA)
+                   Mat &Temp, Mat &Temp2)
 {
 
 // //   std::cout << "scaling factor = " << (dt / pow (2, CFL_pow)) << std::endl;
 // 
-//   std::vector< std::vector <double > > A (NumberOfLayers);
+//   std::vector< std::vector <double > > Abis (NumberOfLayers);
 //   std::vector< std::vector <double > > AA (NumberOfLayers);
 //   std::vector< std::vector <double > > AAA (NumberOfLayers);
 // 
 //   phi1A.resize (NumberOfLayers);
 // 
 //   for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-//     A[k2].assign (NumberOfLayers, 0.);
+//     Abis[k2].assign (NumberOfLayers, 0.);
 //     AA[k2].assign (NumberOfLayers, 0.);
 //     AAA[k2].assign (NumberOfLayers, 0.);
 //     phi1A[k2].assign (NumberOfLayers, 0.);
@@ -2925,7 +2918,7 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 // 
 //   for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
 //     for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-//       A[k1][k2] = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2]; //save the scaled jac in A
+//       Abis[k1][k2] = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2]; //save the scaled jac in A
 // 
 //       if (k1 == k2) phi1A[k1][k2] = 1.; //initialize phi1A to the identity
 //     }
@@ -2945,7 +2938,7 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
 //     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
 //       for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
-//         AA[k1][k2] += A[k1][k3] * A[k3][k2];
+//         AA[k1][k2] += Abis[k1][k3] * Abis[k3][k2];
 //       }
 //     }
 //   }
@@ -2953,14 +2946,14 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
 //     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
 //       for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
-//         AAA[k1][k2] += AA[k1][k3] * A[k3][k2];
+//         AAA[k1][k2] += AA[k1][k3] * Abis[k3][k2];
 //       }
 //     }
 //   }
 // 
 //   for (unsigned i = 0; i < NumberOfLayers; i++) {
 //     for (unsigned j = 0; j < NumberOfLayers; j++) {
-//       phi1A[i][j] += 0.5 * A[i][j] + 1. / 6. * AA[i][j] + 1. / 24. * AAA[i][j];
+//       phi1A[i][j] += 0.5 * Abis[i][j] + 1. / 6. * AA[i][j] + 1. / 24. * AAA[i][j];
 //     }
 //   }
 // 
@@ -2986,7 +2979,7 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 //    for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
 //       for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
 //         for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
-//           Temp[ii][jj] += A[ii][kk] * phi1ASquared[kk][jj];
+//           Temp[ii][jj] += Abis[ii][kk] * phi1ASquared[kk][jj];
 //         }
 //       }
 //     }
@@ -3004,7 +2997,7 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
 //     }
 // 
 //   }
-
+// 
 // //   std::cout << "phi1A ------------------- " << std::endl;
 // //
 // //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
@@ -3019,47 +3012,37 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   //BEGIN PETSC
   phi1A.resize (NumberOfLayers);
 
-  for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-    phi1A[k1].assign (NumberOfLayers, 0.);
-  }
-
   PetscInt k1;
   PetscInt k2;
 
+  MatZeroEntries(phi1APetsc); 
+  
   for (k1 = 0; k1 < NumberOfLayers; k1++) {
+    phi1A[k1].assign (NumberOfLayers, 0.);
+    double value1 = 1.;
+    MatSetValue (phi1APetsc, k1, k1, value1, INSERT_VALUES);
+    //phi1A has been set has the identity matrix
     for (k2 = 0; k2 < NumberOfLayers; k2++) {
-    double value = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2] ;
-      MatSetValue (A, k1, k2, value, INSERT_VALUES);
+    double value2 = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2] ;
+      MatSetValue (A, k1, k2, value2, INSERT_VALUES);
     }
   }
-  
+
   MatAssemblyBegin (A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd (A, MAT_FINAL_ASSEMBLY);
-  
-  MatZeroEntries(phi1APetsc);   
-  for (k1 = 0; k1 < NumberOfLayers; k1++) {
-    double value = 1.;
-    MatSetValues (phi1APetsc, 1, &k1, 1, &k1, &value, INSERT_VALUES);
-    //phi1A has been set has the identity matrix
-  }
   
   MatAssemblyBegin (phi1APetsc, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd (phi1APetsc, MAT_FINAL_ASSEMBLY);
 
-  MatMatMult (A, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AA);
+  MatMatMult (A, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp);
   
-  MatMatMult (AA, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AAA);
+  MatMatMult (Temp, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp2);
 
   MatAXPY (phi1APetsc, 1. / 2., A, DIFFERENT_NONZERO_PATTERN);
 
-  MatAXPY (phi1APetsc, 1. / 6., AA, DIFFERENT_NONZERO_PATTERN);
+  MatAXPY (phi1APetsc, 1. / 6., Temp, DIFFERENT_NONZERO_PATTERN);
 
-  MatAXPY (phi1APetsc, 1. / 24., AAA, DIFFERENT_NONZERO_PATTERN);
-  
-  Mat Temp;
-  Mat Temp2;
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp);
-  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp2);
+  MatAXPY (phi1APetsc, 1. / 24., Temp2, DIFFERENT_NONZERO_PATTERN);
 
   for (unsigned i = 0; i < CFL_pow; i++) {
 
@@ -3087,9 +3070,6 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   }
 
   //MatView ( phi1APetsc, PETSC_VIEWER_STDOUT_WORLD );
-  
-  MatDestroy (&Temp);
-  MatDestroy (&Temp2);
 
   //END
 
