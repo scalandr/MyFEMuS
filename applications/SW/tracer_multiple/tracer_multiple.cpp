@@ -43,7 +43,7 @@ unsigned counter2 = 0;
 
 clock_t start_time = clock();
 
-bool phi_once = true;
+bool phi_once = false;
 bool constant_jac = false;
 bool twostage = true;
 bool assembly = true; //assembly must be left always true
@@ -569,7 +569,8 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
 void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned & numberOfTimeSteps);
 
-void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y);
+void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y, Mat &A, Mat &phi1APetsc, 
+                   Mat &AA, Mat &AAA);
 
 void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJac, std::vector < std::vector < double > > &phi1A, Mat &A, Mat &phi1APetsc, 
                    Mat &AA, Mat &AAA);
@@ -1488,8 +1489,7 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
         if (counter == 0) create_phi1A (CFL_pow, Jac[i], phi1A[i], JacScaled, phi1APetsc, AA, AAA);
 
         for (int ii = 0; ii < NumberOfLayers; ii++) {
-          double value1 = 0.; //tracer 1
-
+          double value1 = 0.; //tracer 1 
 //           double value2 = 0.; //tracer 2
 //           double value3 = 0.; //tracer 3
           for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
@@ -1557,13 +1557,13 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
       else {
         //tracer 1
-        build_phi1Av (CFL_pow, Jac[i], Res, y1);
+        build_phi1Av (CFL_pow, Jac[i], Res, y1, JacScaled, phi1APetsc, AA, AAA);
         VecScale (y1, dt);
 //         //tracer 2
-//         build_phi1Av (CFL_pow, Jac[i], aResHS, y2);
+//         build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, AA, AAA);
 //         VecScale (y2, dt);
 //         //tracer 3
-//         build_phi1Av (CFL_pow, Jac[i], aResHZ, y3);
+//         build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, AA, AAA);
 //         VecScale (y3, dt);
       }
 
@@ -2029,13 +2029,13 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
         else {
           //tracer 1
-          build_phi1Av (CFL_pow, Jac[i], aResHT, y1);
+          build_phi1Av (CFL_pow, Jac[i], aResHT, y1, JacScaled, phi1APetsc, AA, AAA);
           VecScale (y1, 0.5 * dt);
 //           //tracer 2
-//           build_phi1Av (CFL_pow, Jac[i], aResHS, y2);
+//           build_phi1Av (CFL_pow, Jac[i], aResHS, y2, JacScaled, phi1APetsc, AA, AAA);
 //           VecScale (y2, 0.5 * dt);
 //           //tracer 3
-//           build_phi1Av (CFL_pow, Jac[i], aResHZ, y3);
+//           build_phi1Av (CFL_pow, Jac[i], aResHZ, y3, JacScaled, phi1APetsc, AA, AAA);
 //           VecScale (y3, 0.5 * dt);
         }
 
@@ -2694,201 +2694,213 @@ void RK4 (MultiLevelProblem& ml_prob, const bool & implicitEuler, const unsigned
 
 }
 
-void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y)
+void build_phi1Av (const unsigned &CFL_pow, const std::vector < double > &NodeJac, const std::vector< double > &Res, Vec &y, Mat &A, Mat &phi1APetsc, 
+                   Mat &AA, Mat &AAA)
 {
 
-//   std::cout << "scaling factor = " << (dt / pow (2, CFL_pow)) << std::endl;
-
-  std::vector< std::vector <double > > A (NumberOfLayers);
-  std::vector< std::vector <double > > AA (NumberOfLayers);
-  std::vector< std::vector <double > > AAA (NumberOfLayers);
-  std::vector< std::vector <double > > phi1A (NumberOfLayers);
-
-  for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-    A[k2].assign (NumberOfLayers, 0.);
-    AA[k2].assign (NumberOfLayers, 0.);
-    AAA[k2].assign (NumberOfLayers, 0.);
-    phi1A[k2].assign (NumberOfLayers, 0.);
-  }
-
-  for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-    for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-      A[k1][k2] = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2]; //save the scaled jac in A
-
-      if (k1 == k2) phi1A[k1][k2] = 1.; //initialize phi1A to the identity
-    }
-  }
-
-
-//   std::cout << "A ------------------- " << std::endl;
-//
+  //BEGIN IMPLEMENTATION WITH FOR CYCLES 
+  
+//   //std::cout << "scaling factor = " << (dt / pow (2, CFL_pow)) << std::endl;
+// 
+//   std::vector< std::vector <double > > A (NumberOfLayers);
+//   std::vector< std::vector <double > > AA (NumberOfLayers);
+//   std::vector< std::vector <double > > AAA (NumberOfLayers);
+//   std::vector< std::vector <double > > phi1A (NumberOfLayers);
+// 
+//   for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
+//     A[k2].assign (NumberOfLayers, 0.);
+//     AA[k2].assign (NumberOfLayers, 0.);
+//     AAA[k2].assign (NumberOfLayers, 0.);
+//     phi1A[k2].assign (NumberOfLayers, 0.);
+//   }
+// 
+//   for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
+//     for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
+//       A[k1][k2] = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2]; //save the scaled jac in A
+// 
+//       if (k1 == k2) phi1A[k1][k2] = 1.; //initialize phi1A to the identity
+//     }
+//   }
+// 
+// 
+// //   std::cout << "A ------------------- " << std::endl;
+// //
+// //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
+// //     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
+// //       std::cout.precision(16);
+// //       std::cout << A[k1][k2] * pow (2, CFL_pow) / dt << " ";
+// //     }
+// //
+// //     std::cout << std::endl;
+// //   }
+// 
 //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
 //     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-//       std::cout.precision(16);
-//       std::cout << A[k1][k2] * pow (2, CFL_pow) / dt << " ";
+//       for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
+//         AA[k1][k2] += A[k1][k3] * A[k3][k2];
+//       }
 //     }
-//
-//     std::cout << std::endl;
 //   }
+// 
+//   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
+//     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
+//       for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
+//         AAA[k1][k2] += AA[k1][k3] * A[k3][k2];
+//       }
+//     }
+//   }
+// 
+//   for (unsigned i = 0; i < NumberOfLayers; i++) {
+//     for (unsigned j = 0; j < NumberOfLayers; j++) {
+//       phi1A[i][j] += 0.5 * A[i][j] + 1. / 6. * AA[i][j] + 1. / 24. * AAA[i][j];
+//     }
+//   }
+// 
+//   for (unsigned i = 0; i < CFL_pow; i++) {
+// 
+//     std::vector< std::vector <double > > phi1ASquared (NumberOfLayers);
+//     std::vector< std::vector <double > > Temp (NumberOfLayers);
+// 
+//     for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
+//       phi1ASquared[ii].assign (NumberOfLayers, 0.);
+//       Temp[ii].assign (NumberOfLayers, 0.);
+//     }
+// 
+//     for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
+//       for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
+//         for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
+//           phi1ASquared[ii][jj] += phi1A[ii][kk] * phi1A[kk][jj];
+//         }
+//       }
+//     }
+// 
+//     for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
+//       for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
+//         for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
+//           Temp[ii][jj] += A[ii][kk] * phi1ASquared[kk][jj];
+//         }
+//       }
+//     }
+// 
+//     double power = 0.5;
+// 
+//     if (i == 1) power = 1.;
+// 
+//     else if (i > 1) power = pow (2, i - 1);
+// 
+//     for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
+//       for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
+//         phi1A[ii][jj] += power * Temp[ii][jj];
+//       }
+//     }
+// 
+//   }
+// 
+// //   std::cout << "phi1A ------------------- " << std::endl;
+// //
+// //   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
+// //     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
+// //       std::cout.precision(16);
+// //       std::cout << phi1A[k1][k2] << " ";
+// //     }
+// //
+// //     std::cout << std::endl;
+// //   }
+// 
+//   for (int ii = 0; ii < NumberOfLayers; ii++) {
+//     double value = 0.;
+// 
+//     for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
+//       value += phi1A[ii][kk] * Res[kk];
+//     }
+// 
+//     VecSetValues (y, 1, &ii, &value, INSERT_VALUES);
+//   }
+// 
+//   VecAssemblyBegin (y);
+//   VecAssemblyEnd (y);
+// 
+//   //VecView (y, PETSC_VIEWER_STDOUT_WORLD);
+  
+  //END IMPLEMENTATION WITH FOR CYCLES 
 
-  for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-    for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-      for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
-        AA[k1][k2] += A[k1][k3] * A[k3][k2];
-      }
+  
+  //BEGIN PETSC NEW
+
+  PetscInt k1;
+  PetscInt k2;
+  Vec v;
+  
+  VecCreateSeq(PETSC_COMM_SELF,NumberOfLayers,&v);
+
+  for (k1 = 0; k1 < NumberOfLayers; k1++) {
+    for (k2 = 0; k2 < NumberOfLayers; k2++) {
+    double value = (dt / pow (2, CFL_pow)) * NodeJac[k1 * NumberOfLayers + k2] ;
+      MatSetValue (A, k1, k2, value, INSERT_VALUES);
     }
   }
-
-  for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-    for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-      for (unsigned k3 = 0; k3 < NumberOfLayers; k3++) {
-        AAA[k1][k2] += AA[k1][k3] * A[k3][k2];
-      }
-    }
+  
+  MatAssemblyBegin (A, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd (A, MAT_FINAL_ASSEMBLY);
+  
+  MatZeroEntries(phi1APetsc);   
+  for (k1 = 0; k1 < NumberOfLayers; k1++) {
+    double value = 1.;
+    MatSetValues (phi1APetsc, 1, &k1, 1, &k1, &value, INSERT_VALUES);
+    //phi1A has been set has the identity matrix
   }
+  
+  MatAssemblyBegin (phi1APetsc, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd (phi1APetsc, MAT_FINAL_ASSEMBLY);
 
-  for (unsigned i = 0; i < NumberOfLayers; i++) {
-    for (unsigned j = 0; j < NumberOfLayers; j++) {
-      phi1A[i][j] += 0.5 * A[i][j] + 1. / 6. * AA[i][j] + 1. / 24. * AAA[i][j];
-    }
-  }
+  MatMatMult (A, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AA);
+  
+  MatMatMult (AA, A, MAT_REUSE_MATRIX, PETSC_DEFAULT, &AAA);
+
+  MatAXPY (phi1APetsc, 1. / 2., A, DIFFERENT_NONZERO_PATTERN);
+
+  MatAXPY (phi1APetsc, 1. / 6., AA, DIFFERENT_NONZERO_PATTERN);
+
+  MatAXPY (phi1APetsc, 1. / 24., AAA, DIFFERENT_NONZERO_PATTERN);
+  
+  Mat Temp;
+  Mat Temp2;
+  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp);
+  MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &Temp2);
 
   for (unsigned i = 0; i < CFL_pow; i++) {
 
-    std::vector< std::vector <double > > phi1ASquared (NumberOfLayers);
-    std::vector< std::vector <double > > Temp (NumberOfLayers);
+    MatMatMult (phi1APetsc, phi1APetsc, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp);
 
-    for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
-      phi1ASquared[ii].assign (NumberOfLayers, 0.);
-      Temp[ii].assign (NumberOfLayers, 0.);
-    }
+    MatMatMult (A, Temp, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Temp2);
 
-    for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
-      for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
-        for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
-          phi1ASquared[ii][jj] += phi1A[ii][kk] * phi1A[kk][jj];
-        }
-      }
-    }
-
-    for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
-      for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
-        for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
-          Temp[ii][jj] += A[ii][kk] * phi1ASquared[kk][jj];
-        }
-      }
-    }
-
-    double power = 0.5;
+    PetscScalar power = 0.5;
 
     if (i == 1) power = 1.;
 
     else if (i > 1) power = pow (2, i - 1);
 
-    for (unsigned ii = 0; ii < NumberOfLayers; ii++) {
-      for (unsigned jj = 0; jj < NumberOfLayers; jj++) {
-        phi1A[ii][jj] += power * Temp[ii][jj];
-      }
-    }
-
+    MatAXPY (phi1APetsc, power, Temp2, DIFFERENT_NONZERO_PATTERN);
+    //phi1(2A) = (1 / 2) * (2 * I + 2^i * A * phi1A) * phi1A = phi1A + 2^(i-1)*A*(phi1A)^2;
+    
   }
-
-//   std::cout << "phi1A ------------------- " << std::endl;
-//
-//   for (unsigned k1 = 0; k1 < NumberOfLayers; k1++) {
-//     for (unsigned k2 = 0; k2 < NumberOfLayers; k2++) {
-//       std::cout.precision(16);
-//       std::cout << phi1A[k1][k2] << " ";
-//     }
-//
-//     std::cout << std::endl;
-//   }
-
-  for (int ii = 0; ii < NumberOfLayers; ii++) {
-    double value = 0.;
-
-    for (unsigned kk = 0; kk < NumberOfLayers; kk++) {
-      value += phi1A[ii][kk] * Res[kk];
-    }
-
-    VecSetValues (y, 1, &ii, &value, INSERT_VALUES);
+  
+  //MatView ( phi1APetsc, PETSC_VIEWER_STDOUT_WORLD );
+  
+  for (k1 = 0; k1 < NumberOfLayers; k1++) {
+    double value = Res[k1];
+    VecSetValue (v, k1, value, INSERT_VALUES);
   }
+  VecAssemblyBegin (v);
+  VecAssemblyEnd (v);
+  
+  MatMult (phi1APetsc, v, y);
+  
+  MatDestroy (&Temp);
+  MatDestroy (&Temp2);
+  VecDestroy (&v);
 
-  VecAssemblyBegin (y);
-  VecAssemblyEnd (y);
-
-//   VecView (y, PETSC_VIEWER_STDOUT_WORLD);
-
-  //BEGIN PETSC
-//   Mat AA;
-//   Mat AAA;
-//   Mat phi1A;
-//   PetscInt k1;
-//   PetscInt k2;
-//
-//   MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AA);
-//   MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &AAA);
-//   MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &phi1A);
-//
-// //   std::cout << "A  ------------------- " << std::endl;
-// //   MatView (A, PETSC_VIEWER_STDOUT_WORLD);
-// //   std::cout << "AA  ------------------- " << std::endl;
-// //   MatView (AA, PETSC_VIEWER_STDOUT_WORLD);
-// //   std::cout << "AAA  ------------------- " << std::endl;
-// //   MatView (AAA, PETSC_VIEWER_STDOUT_WORLD);
-//
-//   MatMatMult (A, A, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &AA);
-//   MatMatMult (AA, A, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &AAA);
-//
-//   for (k1 = 0; k1 < NumberOfLayers; k1++) {
-//     for (k2 = 0; k2 < NumberOfLayers; k2++) {
-//       double value = (k1 == k2) ? 1. : 0. ;
-//       MatSetValues (phi1A, 1, &k1, 1, &k2, &value, INSERT_VALUES);
-//       //phi1A has been set has the identity matrix
-//     }
-//   }
-//
-//   MatAssemblyBegin (phi1A, MAT_FINAL_ASSEMBLY);
-//   MatAssemblyEnd (phi1A, MAT_FINAL_ASSEMBLY);
-//
-//   MatAXPY (phi1A, 1. / 2., A, SAME_NONZERO_PATTERN);
-//
-//   MatAXPY (phi1A, 1. / 6., AA, SAME_NONZERO_PATTERN);
-//
-//   MatAXPY (phi1A, 1. / 24., AAA, SAME_NONZERO_PATTERN);
-//
-//   for (unsigned i = 0; i < CFL_pow; i++) {
-//
-//     Mat Temp;
-//     Mat Temp2;
-//     MatDuplicate (phi1A, MAT_DO_NOT_COPY_VALUES, &Temp);
-//     MatDuplicate (phi1A, MAT_DO_NOT_COPY_VALUES, &Temp2);
-//
-//     MatMatMult (phi1A, phi1A, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Temp);
-//     MatMatMult (A, Temp, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Temp2);
-//
-//     PetscScalar power = 0.5;
-//     if (i == 1) power = 1.;
-//     else if (i > 1) power = pow (2, i - 1);
-//
-//     MatAXPY (phi1A, power, Temp2, SAME_NONZERO_PATTERN);
-//     //phi1(2A) = (1 / 2) * (2 * I + 2^i * A * phi1A) * phi1A = phi1A + 2^(i-1)*A*(phi1A)^2;
-//
-//     MatDestroy (&Temp);
-//     MatDestroy (&Temp2);
-//
-//   }
-//
-//   //std::cout << "phi1A  ------------------- " << std::endl;
-//   //MatView ( phi1A, PETSC_VIEWER_STDOUT_WORLD );
-//
-//     MatMult (phi1A, v, y);
-//   //VecView(y,PETSC_VIEWER_STDOUT_WORLD);
-//
-//   MatDestroy (&AA);
-//   MatDestroy (&AAA);
-//   MatDestroy (&phi1A);
-  //END
+  //END PETSC NEW
 
 }
 
@@ -3011,19 +3023,8 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
     phi1A[k1].assign (NumberOfLayers, 0.);
   }
 
-  //Mat A;
-  //Mat AA;
-  //Mat AAA;
-  //Mat phi1APetsc;
   PetscInt k1;
   PetscInt k2;
-
-  //MatCreate (MPI_COMM_SELF, &A);
-  //MatSetSizes (A, NumberOfLayers, NumberOfLayers, NumberOfLayers, NumberOfLayers);
-  //MatSetFromOptions (A);
-  //MatSetUp(A);
-  
-  //MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &A);
 
   for (k1 = 0; k1 < NumberOfLayers; k1++) {
     for (k2 = 0; k2 < NumberOfLayers; k2++) {
@@ -3034,10 +3035,6 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   
   MatAssemblyBegin (A, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd (A, MAT_FINAL_ASSEMBLY);
-  
-  //MatDuplicate (A, MAT_DO_NOT_COPY_VALUES, &phi1APetsc);
-  //MatDuplicate (phi1APetsc, MAT_DO_NOT_COPY_VALUES, &phi1APetsc); %Eugenio
-  //MatCreateSeqDense(PETSC_COMM_SELF, NumberOfLayers, NumberOfLayers, NULL, &phi1APetsc);
   
   MatZeroEntries(phi1APetsc);   
   for (k1 = 0; k1 < NumberOfLayers; k1++) {
@@ -3093,11 +3090,6 @@ void create_phi1A (const unsigned &CFL_pow, const std::vector < double > &NodeJa
   
   MatDestroy (&Temp);
   MatDestroy (&Temp2);
-  
-  //MatDestroy (&A);
-  //MatDestroy (&AA);
-  //MatDestroy (&AAA);
-  //MatDestroy (&phi1APetsc);
 
   //END
 
