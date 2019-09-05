@@ -788,7 +788,7 @@ int main (int argc, char** args)
   //mlSol.GetWriter()->SetDebugOutput(true);
   mlSol.GetWriter()->Write (DEFAULT_OUTPUTDIR, "linear", print_vars, 0);
 
-  unsigned numberOfTimeSteps = 200; //17h=1020 with dt=60, 17h=10200 with dt=6
+  unsigned numberOfTimeSteps = 2000; //17h=1020 with dt=60, 17h=10200 with dt=6
   dt = 3.;
   bool implicitEuler = true; 
   
@@ -1397,10 +1397,20 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 
       FNSetScale (f, dt, dt);
 
-      MFNSetDimensions (mfn, 4);
+      if (NLayers==100){
+        MFNSetDimensions (mfn, 10); 
+      }
+      else {
+        MFNSetDimensions (mfn, 4);
+      }
 
       if (i == start || i == start + 1 || i == start + 2 || i == end - 3 || i == end - 2 || i == end - 1) {
-        MFNSetDimensions (mfn, 8);
+        if (NLayers==100){
+         MFNSetDimensions (mfn, 20);
+        }
+        else {
+          MFNSetDimensions (mfn, 8);
+        }
       }
 
       tol = 1e-6;
@@ -1905,11 +1915,21 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
         // FNView(f,PETSC_VIEWER_STDOUT_WORLD);
 
         FNSetScale (f, dt, dt * 0.5);
-
-        MFNSetDimensions (mfn, 4);
+        
+        if (NLayers==100){
+          MFNSetDimensions (mfn, 10); 
+        }
+        else {
+          MFNSetDimensions (mfn, 4);
+        }
 
         if (i == start || i == start + 1 || i == start + 2 || i == end - 3 || i == end - 2 || i == end - 1) {
-          MFNSetDimensions (mfn, 8);
+          if (NLayers==100){
+           MFNSetDimensions (mfn, 20);
+          }
+          else {
+            MFNSetDimensions (mfn, 8);
+          }
         }
 
         tol = 1e-6;
