@@ -390,7 +390,7 @@ int main ( int argc, char ** args )
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction ( SetVariableTimeStep );
-  const unsigned int n_timesteps = 128;
+  const unsigned int n_timesteps = 256; //8 seconds with dt=1./32
 
   std::vector < std::vector <double> > data ( n_timesteps );
   
@@ -408,66 +408,72 @@ int main ( int argc, char ** args )
     system.PrintComputationalTime();
      
     StoreMeshVelocity(ml_prob);
+    
+    //BEGIN for GetSolutionNorm runs
     //data[time_step][0] = time_step/16.;
-    //data[time_step][0] = time_step / 32.;
+    data[time_step][0] = time_step / 32.;
     //data[time_step][0] = time_step / (64*1.4);
-//     if ( simulation == 0 || simulation == 4 ) {
-//       GetSolutionNorm ( ml_sol, 9, data[time_step] );
-//     }
-//     else if ( simulation == 2 ) {   //aneurisma_aorta
-//       GetSolutionNorm ( ml_sol, 14, data[time_step] );
-//     }
-//     else if ( simulation == 3 ) {   //AAA_thrombus, 15=thrombus
-//       GetSolutionNorm ( ml_sol, 7, data[time_step] );
-//     }
-//     ml_sol.GetWriter()->Write ( DEFAULT_OUTPUTDIR, "biquadratic", print_vars, time_step + 1 );
+    if ( simulation == 0 || simulation == 4 ) {   //Turek3D or Turek3D_porous 
+      GetSolutionNorm ( ml_sol, 9, data[time_step] );
+    }
+    else if ( simulation == 2 ) {   //aneurisma_aorta
+      GetSolutionNorm ( ml_sol, 14, data[time_step] );
+    }
+    else if ( simulation == 3 ) {   //AAA_thrombus, 15=thrombus
+      GetSolutionNorm ( ml_sol, 7, data[time_step] );
+    }
+    //END 
+    
+    //printing of the solution
+    //ml_sol.GetWriter()->Write ( DEFAULT_OUTPUTDIR, "biquadratic", print_vars, time_step + 1 );
   }
 
   int  iproc;
   MPI_Comm_rank ( MPI_COMM_WORLD, &iproc );
-//   if ( iproc == 0 ) {
-//     std::ofstream outf;
-//     if ( simulation == 0 ) {
-//       outf.open ( "DataPrint_Turek_3D.txt" );
-//     }
-//     else if ( simulation == 2 ) {
-//       outf.open ( "DataPrint_aorta.txt" );
-//     }
-//     else if ( simulation == 3 ) {
-//       outf.open ( "DataPrint_AAA_thrombus_3D.txt" );
-//     }
-//     else if ( simulation == 4 ) {
-//       outf.open ( "DataPrint_Turek_3D_Porous.txt" );
-//     }
-//     else {
-//       outf.open ( "DataPrint.txt" );
-//     }
+  //BEGIN for GetSolutionNorm runs
+  if ( iproc == 0 ) {
+    std::ofstream outf;
+    if ( simulation == 0 ) {
+      outf.open ( "DataPrint_Turek_3D.txt" );
+    }
+    else if ( simulation == 2 ) {
+      outf.open ( "DataPrint_aorta.txt" );
+    }
+    else if ( simulation == 3 ) {
+      outf.open ( "DataPrint_AAA_thrombus_3D.txt" );
+    }
+    else if ( simulation == 4 ) {
+      outf.open ( "DataPrint_Turek_3D_Porous.txt" );
+    }
+    else {
+      outf.open ( "DataPrint.txt" );
+    }
 
-
-//     if ( !outf ) {
-//       std::cout << "Error in opening file DataPrint.txt";
-//       return 1;
-//     }
-//     for ( unsigned k = 0; k < n_timesteps; k++ ) {
-//       outf << data[k][0] << "\t" << data[k][1] << "\t" << data[k][2] << "\t" << data[k][3] << "\t" << data[k][4] << std::endl;
-//     }
-//     outf.close();
-//   }
+    if ( !outf ) {
+      std::cout << "Error in opening file DataPrint.txt";
+      return 1;
+    }
+    for ( unsigned k = 0; k < n_timesteps; k++ ) {
+      outf << data[k][0] << "\t" << data[k][1] << "\t" << data[k][2] << "\t" << data[k][3] << "\t" << data[k][4] << std::endl;
+    }
+    outf.close();
+  }
+  //END
   
  
-
   // ******* Clear all systems *******
   ml_prob.clear();
   std::cout << " TOTAL TIME:\t" << \
         static_cast<double>(clock() - start_time) / CLOCKS_PER_SEC << std::endl;
-	
-  int  nprocs;	    
+
+//for ksp runs        
+/*  int  nprocs;	    
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   if(iproc == 0){
     char stdOutputName[100];
     sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_turek3D.txt",numberOfUniformRefinedMeshes, nprocs);
     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
-  } 	  	
+  } 	*/  	
 	
   return 0;
 }
