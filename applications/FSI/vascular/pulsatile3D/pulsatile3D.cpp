@@ -390,7 +390,7 @@ int main ( int argc, char ** args )
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction ( SetVariableTimeStep );
-  const unsigned int n_timesteps = 256; //8 seconds with dt=1./32
+  const unsigned int n_timesteps = 160; //5 seconds with dt=1./32
 
   std::vector < std::vector <double> > data ( n_timesteps );
   
@@ -434,7 +434,7 @@ int main ( int argc, char ** args )
   if ( iproc == 0 ) {
     std::ofstream outf;
     if ( simulation == 0 ) {
-      outf.open ( "DataPrint_Turek_3D.txt" );
+      outf.open ( "DataPrint_Turek_3D_3refLevels.txt" );
     }
     else if ( simulation == 2 ) {
       outf.open ( "DataPrint_aorta.txt" );
