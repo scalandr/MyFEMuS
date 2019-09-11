@@ -171,7 +171,7 @@ int main ( int argc, char ** args )
   // ******* Init multilevel mesh from mesh.neu file *******
   unsigned short numberOfUniformRefinedMeshes, numberOfAMRLevels;
 
-  numberOfUniformRefinedMeshes = 2;
+  numberOfUniformRefinedMeshes = 1;
   numberOfAMRLevels = 0;
 
   std::cout << 0 << std::endl;
@@ -434,7 +434,7 @@ int main ( int argc, char ** args )
   if ( iproc == 0 ) {
     std::ofstream outf;
     if ( simulation == 0 ) {
-      outf.open ( "DataPrint_Turek_3D_2refLevels.txt" );
+      outf.open ( "DataPrint_Turek_3D_1refLevels.txt" );
     }
     else if ( simulation == 2 ) {
       outf.open ( "DataPrint_aorta.txt" );
