@@ -171,7 +171,7 @@ int main ( int argc, char ** args )
   // ******* Init multilevel mesh from mesh.neu file *******
   unsigned short numberOfUniformRefinedMeshes, numberOfAMRLevels;
 
-  numberOfUniformRefinedMeshes = 1;
+  numberOfUniformRefinedMeshes = 3;
   numberOfAMRLevels = 0;
 
   std::cout << 0 << std::endl;
@@ -390,7 +390,7 @@ int main ( int argc, char ** args )
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction ( SetVariableTimeStep );
-  const unsigned int n_timesteps = 160; //5 seconds with dt=1./32
+  const unsigned int n_timesteps = 128; //160=5 seconds with dt=1./32
 
   std::vector < std::vector <double> > data ( n_timesteps );
   
@@ -400,7 +400,7 @@ int main ( int argc, char ** args )
     for ( unsigned level = 0; level < numberOfUniformRefinedMeshes; level++ ) {
       SetLambdaNew ( ml_sol, level , SECOND, ELASTICITY );
     }
-    data[time_step].resize ( 5 );
+    //data[time_step].resize ( 5 );
     if ( time_step > 0 )
       system.SetMgType ( V_CYCLE );
     system.CopySolutionToOldSolution();
@@ -411,17 +411,17 @@ int main ( int argc, char ** args )
     
     //BEGIN for GetSolutionNorm runs
     //data[time_step][0] = time_step/16.;
-    data[time_step][0] = time_step / 32.;
+    //data[time_step][0] = time_step / 32.;
     //data[time_step][0] = time_step / (64*1.4);
-    if ( simulation == 0 || simulation == 4 ) {   //Turek3D or Turek3D_porous 
-      GetSolutionNorm ( ml_sol, 9, data[time_step] );
-    }
-    else if ( simulation == 2 ) {   //aneurisma_aorta
-      GetSolutionNorm ( ml_sol, 14, data[time_step] );
-    }
-    else if ( simulation == 3 ) {   //AAA_thrombus, 15=thrombus
-      GetSolutionNorm ( ml_sol, 7, data[time_step] );
-    }
+//     if ( simulation == 0 || simulation == 4 ) {   //Turek3D or Turek3D_porous 
+//       GetSolutionNorm ( ml_sol, 9, data[time_step] );
+//     }
+//     else if ( simulation == 2 ) {   //aneurisma_aorta
+//       GetSolutionNorm ( ml_sol, 14, data[time_step] );
+//     }
+//     else if ( simulation == 3 ) {   //AAA_thrombus, 15=thrombus
+//       GetSolutionNorm ( ml_sol, 7, data[time_step] );
+//     }
     //END 
     
     //printing of the solution
@@ -431,33 +431,33 @@ int main ( int argc, char ** args )
   int  iproc;
   MPI_Comm_rank ( MPI_COMM_WORLD, &iproc );
   //BEGIN for GetSolutionNorm runs
-  if ( iproc == 0 ) {
-    std::ofstream outf;
-    if ( simulation == 0 ) {
-      outf.open ( "DataPrint_Turek_3D_1refLevels.txt" );
-    }
-    else if ( simulation == 2 ) {
-      outf.open ( "DataPrint_aorta.txt" );
-    }
-    else if ( simulation == 3 ) {
-      outf.open ( "DataPrint_AAA_thrombus_3D.txt" );
-    }
-    else if ( simulation == 4 ) {
-      outf.open ( "DataPrint_Turek_3D_Porous.txt" );
-    }
-    else {
-      outf.open ( "DataPrint.txt" );
-    }
-
-    if ( !outf ) {
-      std::cout << "Error in opening file DataPrint.txt";
-      return 1;
-    }
-    for ( unsigned k = 0; k < n_timesteps; k++ ) {
-      outf << data[k][0] << "\t" << data[k][1] << "\t" << data[k][2] << "\t" << data[k][3] << "\t" << data[k][4] << std::endl;
-    }
-    outf.close();
-  }
+//   if ( iproc == 0 ) {
+//     std::ofstream outf;
+//     if ( simulation == 0 ) {
+//       outf.open ( "DataPrint_Turek_3D_1refLevels.txt" );
+//     }
+//     else if ( simulation == 2 ) {
+//       outf.open ( "DataPrint_aorta.txt" );
+//     }
+//     else if ( simulation == 3 ) {
+//       outf.open ( "DataPrint_AAA_thrombus_3D.txt" );
+//     }
+//     else if ( simulation == 4 ) {
+//       outf.open ( "DataPrint_Turek_3D_Porous.txt" );
+//     }
+//     else {
+//       outf.open ( "DataPrint.txt" );
+//     }
+// 
+//     if ( !outf ) {
+//       std::cout << "Error in opening file DataPrint.txt";
+//       return 1;
+//     }
+//     for ( unsigned k = 0; k < n_timesteps; k++ ) {
+//       outf << data[k][0] << "\t" << data[k][1] << "\t" << data[k][2] << "\t" << data[k][3] << "\t" << data[k][4] << std::endl;
+//     }
+//     outf.close();
+//   }
   //END
   
  
@@ -467,13 +467,13 @@ int main ( int argc, char ** args )
         static_cast<double>(clock() - start_time) / CLOCKS_PER_SEC << std::endl;
 
 //for ksp runs        
-/*  int  nprocs;	    
+  int  nprocs;	    
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   if(iproc == 0){
     char stdOutputName[100];
-    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_turek3D.txt",numberOfUniformRefinedMeshes, nprocs);
+    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_turek3D.txt", numberOfUniformRefinedMeshes, nprocs);
     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
-  } 	*/  	
+  } 	  	
 	
   return 0;
 }
