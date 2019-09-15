@@ -260,7 +260,8 @@ int main ( int argc, char ** args )
     ml_sol.GenerateBdc ( "V", "Time_dependent" );
   }
   if ( !dimension2D ) ml_sol.GenerateBdc ( "W", "Steady" );
-  ml_sol.GenerateBdc ( "PS", "Steady" );
+  ml_sol.GenerateBdc ( "PS", "Time_dependent" );
+  //ml_sol.GenerateBdc ( "PS", "Steady" );
   ml_sol.GenerateBdc ( "PF", "Steady" );
 
 //   for(unsigned level = 0; level < numberOfUniformRefinedMeshes; level++ ){
