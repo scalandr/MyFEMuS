@@ -610,11 +610,11 @@ bool SetBoundaryConditionTurek ( const std::vector < double > & x, const char na
   else if ( !strcmp ( name, "PS" ) ) {
     test = 0;
     value = 0.;
-//     if ( 2 == facename ) {
+    if ( 2 == facename ) {
 //       value = pressure[j] * ramp;
-//       //value = 5000 * ramp;
-//       //value = (5000 + 1000 * sin(2 * PI * time)) * ramp;
-//     }
+         //value = 5000 * ramp;
+       value = (5000 + 1000 * sin(2 * PI * time)) * ramp;
+    }
   }
   else if ( !strcmp ( name, "PF" ) ) {
     test = 0;
