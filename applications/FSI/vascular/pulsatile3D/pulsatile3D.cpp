@@ -171,7 +171,8 @@ int main ( int argc, char ** args )
   // ******* Init multilevel mesh from mesh.neu file *******
   unsigned short numberOfUniformRefinedMeshes, numberOfAMRLevels;
 
-  numberOfUniformRefinedMeshes = 2;
+  numberOfUniformRefinedMeshes = 3;
+
   numberOfAMRLevels = 0;
 
   std::cout << 0 << std::endl;
@@ -435,7 +436,7 @@ int main ( int argc, char ** args )
   if ( iproc == 0 ) {
     std::ofstream outf;
     if ( simulation == 0 ) {
-      outf.open ( "DataPrint_Turek_3D_2refLevels_withPres.txt" );
+      outf.open ( "DataPrint_Turek_3D_3refLevels_withPres.txt" );
     }
     else if ( simulation == 2 ) {
       outf.open ( "DataPrint_aorta.txt" );
@@ -610,11 +611,11 @@ bool SetBoundaryConditionTurek ( const std::vector < double > & x, const char na
   }
   else if ( !strcmp ( name, "PS" ) ) {
     test = 0;
-    //value = 0.;
+    value = 0.;
     if ( 2 == facename ) {
       //value = pressure[j] * ramp;
-      //value = 5000 * ramp;
-      value = (5000 + 1000 * sin(2 * PI * time)) * ramp;
+      value = 2500 * ramp;
+      //value = (5000 + 1000 * sin(2 * PI * time)) * ramp;
     }
   }
   else if ( !strcmp ( name, "PF" ) ) {
