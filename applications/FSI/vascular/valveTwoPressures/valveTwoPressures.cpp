@@ -267,7 +267,7 @@ int main(int argc, char** args)
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction(SetVariableTimeStep);
-  const unsigned int n_timesteps = 10; //320=5 seconds with dt=1./64, 128=4 s with dt=1./32, 256=4 s with dt=1./128
+  const unsigned int n_timesteps = 256; //320=5 seconds with dt=1./64, 128=4 s with dt=1./32, 256=4 s with dt=1./128
 
   int  iproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
@@ -575,7 +575,7 @@ void PrintConvergenceInfo(char *stdOutfile, const unsigned &level, const int &np
 
   std::ofstream outf;
   char outFileName[100];
-  sprintf(outFileName, "valve2D_convergence_level%d_nprocs%d_stiffness10.txt",level, nprocs);
+  sprintf(outFileName, "valve2D_ksp_level%d_nprocs%d_stiffness5_dt128.txt",level, nprocs);
 
   outf.open(outFileName, std::ofstream::app);
   outf << std::endl << std::endl;
