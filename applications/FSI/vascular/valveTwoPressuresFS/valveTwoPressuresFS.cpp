@@ -333,7 +333,7 @@ int main(int argc, char** args)
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction(SetVariableTimeStep);
-  const unsigned int n_timesteps = 256;
+  const unsigned int n_timesteps = 512;
 
   //std::vector < std::vector <double> > data(n_timesteps);
 
@@ -412,7 +412,7 @@ int main(int argc, char** args)
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   if(iproc == 0){
     char stdOutputName[100];
-    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_stiffness5_dt1su128_FS.txt",numberOfUniformRefinedMeshes, nprocs);
+    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_stiffness5_dt1su256_FS.txt",numberOfUniformRefinedMeshes, nprocs);
     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
   }	    
 	    
@@ -423,7 +423,7 @@ int main(int argc, char** args)
 
 double SetVariableTimeStep(const double time)
 {
-  double dt = 1. / 128;
+  double dt = 1. / 256;
 //   double shiftedTime = time - floor(time);
 //   if (time > 1 && shiftedTime >= 0.125 && shiftedTime < 0.25) {
 //     dt = 1. / 64;
@@ -633,7 +633,7 @@ void PrintConvergenceInfo(char *stdOutfile, const unsigned &level, const int &np
 
   std::ofstream outf;
   char outFileName[100];
-  sprintf(outFileName, "valve2D_convergence_level%d_nprocs%d_stiffness5_dt1su128_FS.txt",level, nprocs);
+  sprintf(outFileName, "valve2D_convergence_level%d_nprocs%d_stiffness5_dt1su256_FS.txt",level, nprocs);
 
   outf.open(outFileName, std::ofstream::app);
   outf << std::endl << std::endl;
