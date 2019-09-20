@@ -436,7 +436,7 @@ int main ( int argc, char ** args )
   if ( iproc == 0 ) {
     std::ofstream outf;
     if ( simulation == 0 ) {
-      outf.open ( "DataPrint_Turek_3D_1refLevels_withPres.txt" );
+      outf.open ( "DataPrint_Turek_3D_1refLevels_withPresSin.txt" );
     }
     else if ( simulation == 2 ) {
       outf.open ( "DataPrint_aorta.txt" );
