@@ -267,7 +267,7 @@ int main(int argc, char** args)
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction(SetVariableTimeStep);
-  const unsigned int n_timesteps = 128; //320=5 seconds with dt=1./64, 128=4 s with dt=1./32
+  const unsigned int n_timesteps = 256; //320=5 seconds with dt=1./64, 128=4 s with dt=1./32, 256=4 s with dt=1./128
 
   int  iproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
@@ -355,7 +355,7 @@ int main(int argc, char** args)
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   if(iproc == 0){
     char stdOutputName[100];
-    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_stiffness5_dt1su32.txt",numberOfUniformRefinedMeshes, nprocs);
+    sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_stiffness5_dt1su128.txt",numberOfUniformRefinedMeshes, nprocs);
     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
   }
      
@@ -366,7 +366,7 @@ int main(int argc, char** args)
 
 double SetVariableTimeStep(const double time)
 {
-  double dt = 1. / 32;
+  double dt = 1. / 128;
 //   double shiftedTime = time - floor(time);
 //   if (time > 1 && shiftedTime >= 0.125 && shiftedTime < 0.25) {
 //     dt = 1. / 64;
