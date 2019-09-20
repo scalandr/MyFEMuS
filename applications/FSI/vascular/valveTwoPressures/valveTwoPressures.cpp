@@ -66,7 +66,7 @@ int main(int argc, char** args)
 
   E = 260 * 1.0e6; //vein young modulus \\15, 30, 30, 40, 60, 260, 260
   //E = 4.3874951 * 1.0e12;
-  E1 = 7.5 * 1.0e6; //leaflet young modulus \\0.5, 0.8, 1, 1.5, 1.5, 2.2, 1.5
+  E1 = 4.5 * 1.0e6; //leaflet young modulus \\0.5, 0.8, 1, 1.5, 1.5, 2.2, 1.5
   ni1 = 0.5; //0.4999
   
   Parameter par(Lref, Uref);
@@ -89,7 +89,7 @@ int main(int argc, char** args)
   // ******* Init multilevel mesh from mesh.neu file *******
   unsigned short numberOfUniformRefinedMeshes, numberOfAMRLevels;
 
-  numberOfUniformRefinedMeshes = 4;
+  numberOfUniformRefinedMeshes = 5;
 
   numberOfAMRLevels = 0;
 
@@ -267,9 +267,7 @@ int main(int argc, char** args)
 
   // time loop parameter
   system.AttachGetTimeIntervalFunction(SetVariableTimeStep);
-  const unsigned int n_timesteps = 512;
-
-  //std::vector < std::vector <double> > data(n_timesteps);
+  const unsigned int n_timesteps = 320; //5 seconds with dt=1./64
 
   int  iproc;
   MPI_Comm_rank(MPI_COMM_WORLD, &iproc);
@@ -279,7 +277,7 @@ int main(int argc, char** args)
   if(iproc == 0) {
     //char *foutname;
     char foutname[100];
-    sprintf(foutname, "fluxes_E1=%g_level=%d_incomp_dt128.txt",E1,numberOfUniformRefinedMeshes);
+    sprintf(foutname, "fluxes_E1=%g_level=%d_incomp_dt64.txt", E1, numberOfUniformRefinedMeshes);
     //sprintf(foutname, "ksp_fluxes_E1=%g.txt",E1);
     outf.open(foutname);
     
@@ -288,9 +286,10 @@ int main(int argc, char** args)
       return 1;
     }
   }
-
-//   std::vector < double > Qtot(3, 0.);
-//   std::vector<double> fluxes(2, 0.);
+  
+  //fluxes
+  std::vector < double > Qtot(3, 0.);
+  std::vector<double> fluxes(2, 0.);
 
   system.ResetComputationalTime();
   
@@ -311,25 +310,25 @@ int main(int argc, char** args)
 
     StoreMeshVelocity(ml_prob);
 
-    //fluxes
-//     double dt = system.GetIntervalTime();
-// 
-//     Qtot[0] += 0.5 * dt * fluxes[0];
-//     Qtot[1] += 0.5 * dt * fluxes[1];
-// 
-//     GetSolutionFluxes(ml_sol, fluxes);
-// 
-//     Qtot[0] += 0.5 * dt * fluxes[0];
-//     Qtot[1] += 0.5 * dt * fluxes[1];
-//     Qtot[2] = Qtot[0] + Qtot[1];
-// 
-// 
-//     std::cout << fluxes[0] << " " << fluxes[1] << " " << Qtot[0] << " " << Qtot[1] << " " << Qtot[2] << std::endl;
-// 
-// 
-//     if(iproc == 0) {
-//       outf << time_step << "," << system.GetTime() << "," << fluxes[0] << "," << fluxes[1] << "," << Qtot[0] << "," << Qtot[1] << "," << Qtot[2] << std::endl;
-//     }
+    //BEGIN FLUXES
+    double dt = system.GetIntervalTime();
+
+    Qtot[0] += 0.5 * dt * fluxes[0];
+    Qtot[1] += 0.5 * dt * fluxes[1];
+
+    GetSolutionFluxes(ml_sol, fluxes);
+
+    Qtot[0] += 0.5 * dt * fluxes[0];
+    Qtot[1] += 0.5 * dt * fluxes[1];
+    Qtot[2] = Qtot[0] + Qtot[1];
+
+
+    std::cout << fluxes[0] << " " << fluxes[1] << " " << Qtot[0] << " " << Qtot[1] << " " << Qtot[2] << std::endl;
+
+
+    if(iproc == 0) {
+      outf << time_step << "," << system.GetTime() << "," << fluxes[0] << "," << fluxes[1] << "," << Qtot[0] << "," << Qtot[1] << "," << Qtot[2] << std::endl;
+    }
 
     //ml_sol.GetWriter()->SetMovingMesh(mov_vars);
     //ml_sol.GetWriter()->Write(DEFAULT_OUTPUTDIR, "biquadratic", print_vars, time_step);
@@ -338,9 +337,10 @@ int main(int argc, char** args)
 
   }
 
-//   if(iproc == 0) {
-//     outf.close();
-//   }
+  if(iproc == 0) {
+    outf.close();
+  }
+  //END
 
 
   
@@ -349,7 +349,8 @@ int main(int argc, char** args)
   
   std::cout << " TOTAL TIME:\t" << \
             static_cast<double>(clock() - start_time) / CLOCKS_PER_SEC << std::endl;
-    
+
+  //for ksp runs  
 //   int  nprocs;	    
 //   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 //   if(iproc == 0){
@@ -357,7 +358,7 @@ int main(int argc, char** args)
 //     sprintf(stdOutputName, "stdoutput_level%d_nprocs%d_stiffness10.txt",numberOfUniformRefinedMeshes, nprocs);
 //     PrintConvergenceInfo(stdOutputName, numberOfUniformRefinedMeshes, nprocs);
 //   }
-//     
+     
   return 0;
 }
 
