@@ -575,7 +575,7 @@ void PrintConvergenceInfo(char *stdOutfile, const unsigned &level, const int &np
 
   std::ofstream outf;
   char outFileName[100];
-  sprintf(outFileName, "valve2D_ksp_level%d_nprocs%d_stiffness5_dt256.txt",level, nprocs);
+  sprintf(outFileName, "valve2D_ksp_level%d_nprocs%d_stiffness5_dt1su256.txt",level, nprocs);
 
   outf.open(outFileName, std::ofstream::app);
   outf << std::endl << std::endl;
