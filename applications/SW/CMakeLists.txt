@@ -43,4 +43,6 @@ IF(SLEPC_FOUND)
   ADD_SUBDIRECTORY(tracer_multiple/)
   
   ADD_SUBDIRECTORY(tracer_6multiple/)
+  
+  ADD_SUBDIRECTORY(radioactive_tracers/)
 ENDIF(SLEPC_FOUND)
