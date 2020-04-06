@@ -574,7 +574,7 @@ int main (int argc, char** args)
   //unsigned nx = static_cast<unsigned> (floor (pow (2.,2) + 0.5));       //Grid cell size = 3.90625 m
   unsigned nx = static_cast<unsigned> (floor (pow (2.,/*5*/ 3) + 0.5));       //Grid cell size = 3.90625 m
   nx += 4;
-  //nx += 8;
+  //nx += 16;
   //std::cout <<" nx = " << nx << std::endl;
 
   double length = 10.; //40.;
@@ -754,7 +754,7 @@ int main (int argc, char** args)
   //mlSol.GetWriter()->SetDebugOutput(true);
   mlSol.GetWriter()->Write (DEFAULT_OUTPUTDIR, "linear", print_vars, 0);
 
-  unsigned numberOfTimeSteps = 2400; //RK4: dt=0.5, numberOfTimeSteps = 16001
+  unsigned numberOfTimeSteps = 241; //RK4: dt=0.5, numberOfTimeSteps = 16001
   dt = 0.25;
   bool implicitEuler = true;
 

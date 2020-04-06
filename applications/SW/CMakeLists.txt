@@ -44,5 +44,7 @@ IF(SLEPC_FOUND)
   
   ADD_SUBDIRECTORY(tracer_6multiple/)
   
-  ADD_SUBDIRECTORY(radioactive_tracers/)
+  ADD_SUBDIRECTORY(biogeochem_explicit/)
+  
+  ADD_SUBDIRECTORY(biogeochem_implicit/)
 ENDIF(SLEPC_FOUND)

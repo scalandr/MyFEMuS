@@ -29,7 +29,7 @@ double rho1[20] = {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1
 
 double dt = 60.; //= dx / maxWaveSpeed * 0.85;
 
-double ni_h = 1.; // 0.1, 1, 10, 100, 200
+double ni_h = 100.; // 0.1, 1, 10, 100, 200
 
 double ni_v = 0.0001;
 
@@ -38,6 +38,8 @@ double ni_v = 0.0001;
 // double k_v = 0.00001;
 
 const unsigned NumberOfLayers = 20;
+
+unsigned counter = 0;
 
 //const double hRest[10]={2,2,2,2,2,2,2,2,2,2};
 const double hRest[20] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -71,7 +73,7 @@ bool SetBoundaryCondition ( const std::vector < double >& x, const char SolName[
 }
 
 
-void ETD ( MultiLevelProblem& ml_prob );
+void ETD ( MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps );
 
 
 int main ( int argc, char** args ) {
@@ -174,16 +176,17 @@ int main ( int argc, char** args ) {
   //mlSol.GetWriter()->SetDebugOutput(true);
   mlSol.GetWriter()->Write ( DEFAULT_OUTPUTDIR, "linear", print_vars, 0 );
 
-  unsigned numberOfTimeSteps = 1800; //17h=1020 with dt=60, 17h=10200 with dt=6
+  unsigned numberOfTimeSteps = 190; //17h=1020 with dt=60, 17h=10200 with dt=6
   for ( unsigned i = 0; i < numberOfTimeSteps; i++ ) {
-    ETD ( ml_prob );
+    counter = i;
+    ETD ( ml_prob, numberOfTimeSteps);
     mlSol.GetWriter()->Write ( DEFAULT_OUTPUTDIR, "linear", print_vars, ( i + 1 ) / 1 );
   }
   return 0;
 }
 
 
-void ETD ( MultiLevelProblem& ml_prob ) {
+void ETD ( MultiLevelProblem& ml_prob,  const unsigned &numberOfTimeSteps ) {
 
   const unsigned& NLayers = NumberOfLayers;
 
@@ -803,6 +806,14 @@ void ETD ( MultiLevelProblem& ml_prob ) {
       double valueH = ( *sol->_Sol[solIndexh[k]] ) ( i );
 
       double valueT = valueHT / valueH;
+      
+      double TRef = 5.; 
+      double rhok = rho1[k] - 0.2 * ( valueT - TRef );
+      
+      if (counter == numberOfTimeSteps - 1) {
+        std::cout.precision (14);
+        std::cout << valueT << std::endl;
+      }
 
       sol->_Sol[solIndexT[k]]->set ( i, valueT );
     }
