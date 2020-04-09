@@ -1272,15 +1272,16 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
       //aResHT[k] += - solHT[k].value() * lambda;
       //aResHTLili[k] += - solHT[k].value() * lambda;
       
-      double dim = 1./86400.; 
-      double aa = 2.0 * dim;
-      double bb = 0.5 * dim;
+      double dimensione = 1./86400.; //second^{-1}
+      //double dimensione = 1./1400.; //minute^{-1}
+      double aa = 2.0 * dimensione;
+      double bb = 0.5 * dimensione;
       double cc = 0.5; //TODO
-      double rr = 0.1 * dim;
+      double rr = 0.1 * dimensione; //1. * dimensione;
       double kk = 0.2; //TODO
-      double delta = 0.35 * dim;
-      double delta1 = 0.15 * dim;
-      double eps = 0.2 * dim;
+      double delta = 0.35 * dimensione; //0.01 * dimensione;
+      double delta1 = 0.15 * dimensione; //0.49 * dimensione;
+      double eps = 0.2 * dimensione;
       
       //tracer 1 
       aResHT[k] += aa * solHT[k].value() * (solHS[k] / (kk + solHS[k])) - bb * (1. - exp(- cc * solHT[k].value())) * solHZ[k] 
@@ -1842,15 +1843,16 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
         //radioactive tracer 1
         //aResHT[k] += - solHT[k] * lambda;
         
-        double dim = 1./86400.; 
-        double aa = 2.0 * dim;
-        double bb = 0.5 * dim;
+        double dimensione = 1./86400.; //second^{-1}
+        //double dimensione = 1./1400.; //minute^{-1} 
+        double aa = 2.0 * dimensione;
+        double bb = 0.5 * dimensione;
         double cc = 0.5; //TODO
-        double rr = 0.1 * dim;
+        double rr = 0.1 * dimensione; //1. * dimensione;
         double kk = 0.2; //TODO
-        double delta = 0.35 * dim;
-        double delta1 = 0.15 * dim;
-        double eps = 0.2 * dim;
+        double delta = 0.35 * dimensione; //0.01 * dimensione;
+        double delta1 = 0.15 * dimensione; //0.49 * dimensione;
+        double eps = 0.2 * dimensione;
       
         //tracer 1 
         aResHT[k] += aa * solHT[k] * (solHS[k] / (kk + solHS[k])) - bb * (1. - exp(- cc * solHT[k])) * solHZ[k] 
