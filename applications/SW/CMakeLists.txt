@@ -47,4 +47,6 @@ IF(SLEPC_FOUND)
   ADD_SUBDIRECTORY(biogeochem_explicit/)
   
   ADD_SUBDIRECTORY(biogeochem_implicit/)
+  
+  ADD_SUBDIRECTORY(biogeochem_implicit_2jacs/)
 ENDIF(SLEPC_FOUND)
