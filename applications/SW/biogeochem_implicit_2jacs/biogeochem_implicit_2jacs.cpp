@@ -1301,20 +1301,20 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
       double kk = 0.2; //TODO
       double delta = 0.35 * dimensione; //0.35 * dimensione;
       double delta1 = 0.15 * dimensione; //0.15 * dimensione;
-      double eps = 0.2 * dimensione * 1000.;
+      double eps = 0.2 * dimensione;
       
       //SPLITTING 1
-//       //tracer 1
-//       aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k].value() 
-//                  + bb * exp(- cc * solHT[k].value()) * solHZ[k].value() - rr * solHT[k];
-//       aResHTLili[k] += - bb * solHZ[k].value() + bb * exp(- cc * solHT[k].value()) * solHZ[k].value();
-//       //tracer 3
-//       aResHZ[k] += solHZ[k] * (delta * (1. - exp(- cc * solHT[k].value())) - eps);
-//       //tracer 2
-//       aResHS[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() + eps * solHZ[k].value()  
-//                 + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
-//       aResHSLili[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() 
-//                        + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
+      //tracer 1
+      aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k].value() 
+                 + bb * exp(- cc * solHT[k].value()) * solHZ[k].value() - rr * solHT[k];
+      aResHTLili[k] += - bb * solHZ[k].value() + bb * exp(- cc * solHT[k].value()) * solHZ[k].value();
+      //tracer 3
+      aResHZ[k] += solHZ[k] * (delta * (1. - exp(- cc * solHT[k].value())) - eps);
+      //tracer 2
+      aResHS[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() + eps * solHZ[k].value()  
+                + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
+      aResHSLili[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() 
+                       + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
                 
       //SPLITTING 2     
 //       //tracer 1 
@@ -1347,14 +1347,14 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 //                        + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
       
       //SPLITTING 4     
-      //tracer 1 
-      aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k] 
-                   + bb * exp(- cc * solHT[k].value()) * solHZ[k] - rr * solHT[k];             
-      //tracer 2
-      aResHZ[k] += - solHZ[k] * eps + solHZ[k] * delta - solHZ[k] * delta * exp(- cc * solHT[k].value());
-      //tracer 3
-      aResHS[k] += - aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k] + eps * solHZ[k]  
-                     + delta1 * solHZ[k] - delta1 * exp(- cc * solHT[k].value()) * solHZ[k];
+//       //tracer 1 
+//       aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k] 
+//                    + bb * exp(- cc * solHT[k].value()) * solHZ[k] - rr * solHT[k];             
+//       //tracer 2
+//       aResHZ[k] += - solHZ[k] * eps + solHZ[k] * delta - solHZ[k] * delta * exp(- cc * solHT[k].value());
+//       //tracer 3
+//       aResHS[k] += - aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k] + eps * solHZ[k]  
+//                      + delta1 * solHZ[k] - delta1 * exp(- cc * solHT[k].value()) * solHZ[k];
       
       //END FORCING TERM
       
@@ -2062,20 +2062,20 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
         double kk = 0.2; //TODO
         double delta = 0.35 * dimensione; //0.35 * dimensione;
         double delta1 = 0.15 * dimensione; //0.15 * dimensione;
-        double eps = 0.2 * dimensione * 1000.;
+        double eps = 0.2 * dimensione;
       
         //SPLITTING 1
-//         //tracer 1
-//         aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k].value() 
-//                    + bb * exp(- cc * solHT[k].value()) * solHZ[k].value() - rr * solHT[k];
-//         aResHTLili[k] += - bb * solHZ[k].value() + bb * exp(- cc * solHT[k].value()) * solHZ[k].value();
-//         //tracer 3
-//         aResHZ[k] += solHZ[k] * (delta * (1. - exp(- cc * solHT[k].value())) - eps);
-//         //tracer 2
-//         aResHS[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() + eps * solHZ[k].value()  
-//                   + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
-//         aResHSLili[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() 
-//                          + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
+        //tracer 1
+        aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k].value() 
+                   + bb * exp(- cc * solHT[k].value()) * solHZ[k].value() - rr * solHT[k];
+        aResHTLili[k] += - bb * solHZ[k].value() + bb * exp(- cc * solHT[k].value()) * solHZ[k].value();
+        //tracer 3
+        aResHZ[k] += solHZ[k] * (delta * (1. - exp(- cc * solHT[k].value())) - eps);
+        //tracer 2
+        aResHS[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() + eps * solHZ[k].value()  
+                  + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
+        aResHSLili[k] += - aa * solHT[k].value() * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k].value() 
+                         + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
                 
         //SPLITTING 2     
 //         //tracer 1 
@@ -2108,14 +2108,14 @@ void ETD (MultiLevelProblem& ml_prob, const unsigned & numberOfTimeSteps, Mat &J
 //                        + eps * solHZ[k].value() + delta1 * (1. - exp(- cc * solHT[k].value())) * solHZ[k].value();
       
         //SPLITTING 4     
-        //tracer 1 
-        aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k] 
-                     + bb * exp(- cc * solHT[k].value()) * solHZ[k] - rr * solHT[k];             
-        //tracer 2
-        aResHZ[k] += - solHZ[k] * eps + solHZ[k] * delta - solHZ[k] * delta * exp(- cc * solHT[k].value());
-        //tracer 3
-        aResHS[k] += - aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k] + eps * solHZ[k]  
-                       + delta1 * solHZ[k] - delta1 * exp(- cc * solHT[k].value()) * solHZ[k];
+//         //tracer 1 
+//         aResHT[k] += aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) - bb * solHZ[k] 
+//                      + bb * exp(- cc * solHT[k].value()) * solHZ[k] - rr * solHT[k];             
+//         //tracer 2
+//         aResHZ[k] += - solHZ[k] * eps + solHZ[k] * delta - solHZ[k] * delta * exp(- cc * solHT[k].value());
+//         //tracer 3
+//         aResHS[k] += - aa * solHT[k] * (solHS[k].value() / (kk + solHS[k].value())) + rr * solHT[k] + eps * solHZ[k]  
+//                        + delta1 * solHZ[k] - delta1 * exp(- cc * solHT[k].value()) * solHZ[k];
       
         //END FORCING TERM
 
